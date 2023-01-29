@@ -1,0 +1,537 @@
+{
+	"info": {
+		"_postman_id": "8ce58a02-07e9-458a-abdf-5bf574600779",
+		"name": "dictionaryV3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15786791"
+	},
+	"item": [
+		{
+			"name": "card get by params",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/card",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"card"
+					],
+					"query": [
+						{
+							"key": "text",
+							"value": "let",
+							"disabled": true
+						},
+						{
+							"key": "lang-first",
+							"value": "eng",
+							"disabled": true
+						},
+						{
+							"key": "lang-second",
+							"value": "bel",
+							"disabled": true
+						},
+						{
+							"key": "country-first",
+							"value": "BELARUS",
+							"disabled": true
+						},
+						{
+							"key": "country-second",
+							"value": "BELARUS",
+							"disabled": true
+						},
+						{
+							"key": "number",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "card get by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/card/72c99ef5-c8b9-4540-bb8a-293f1f4b2c7c",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"card",
+						"72c99ef5-c8b9-4540-bb8a-293f1f4b2c7c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "card get count",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/card/count",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"card",
+						"count"
+					],
+					"query": [
+						{
+							"key": "text",
+							"value": "let",
+							"disabled": true
+						},
+						{
+							"key": "lang-first",
+							"value": "eng",
+							"disabled": true
+						},
+						{
+							"key": "lang-second",
+							"value": "bel",
+							"disabled": true
+						},
+						{
+							"key": "country-first",
+							"value": "BELARUS",
+							"disabled": true
+						},
+						{
+							"key": "country-second",
+							"value": "BELARUS",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "image get info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/image/info/6292dcf5-7cac-4a89-865a-4d13c030b688",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"image",
+						"info",
+						"6292dcf5-7cac-4a89-865a-4d13c030b688"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "image head info",
+			"request": {
+				"method": "HEAD",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/image/info/6292dcf5-7cac-4a89-865a-4d13c030b688",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"image",
+						"info",
+						"6292dcf5-7cac-4a89-865a-4d13c030b688"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "module get by params",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/module",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"module"
+					],
+					"query": [
+						{
+							"key": "text",
+							"value": "100",
+							"disabled": true
+						},
+						{
+							"key": "lang-first",
+							"value": "eng",
+							"disabled": true
+						},
+						{
+							"key": "lang-second",
+							"value": "bel",
+							"disabled": true
+						},
+						{
+							"key": "country-first",
+							"value": "BELARUS",
+							"disabled": true
+						},
+						{
+							"key": "country-second",
+							"value": "BELARUS",
+							"disabled": true
+						},
+						{
+							"key": "number",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "module get by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/module/eab36f6f-0cf5-430f-bc09-4cfa1b227428",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"module",
+						"eab36f6f-0cf5-430f-bc09-4cfa1b227428"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "module get count by params",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/module/count",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"module",
+						"count"
+					],
+					"query": [
+						{
+							"key": "text",
+							"value": "Do",
+							"disabled": true
+						},
+						{
+							"key": "lang-first",
+							"value": "eng",
+							"disabled": true
+						},
+						{
+							"key": "lang-second",
+							"value": "bel",
+							"disabled": true
+						},
+						{
+							"key": "country-first",
+							"value": "BELARUS",
+							"disabled": true
+						},
+						{
+							"key": "country-second",
+							"value": "BELARUS",
+							"disabled": true
+						},
+						{
+							"key": "number",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "module-card get by module-id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/module-card",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"module-card"
+					],
+					"query": [
+						{
+							"key": "module-id",
+							"value": "eab36f6f-0cf5-430f-bc09-4cfa1b227428",
+							"disabled": true
+						},
+						{
+							"key": "number",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "module-card get by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/module-card/51cef1dd-392c-4d2f-b8cf-be9f2454ce0c",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"module-card",
+						"51cef1dd-392c-4d2f-b8cf-be9f2454ce0c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "module-card get count by module-id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/module-card/count/eab36f6f-0cf5-430f-bc09-4cfa1b227428",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"module-card",
+						"count",
+						"eab36f6f-0cf5-430f-bc09-4cfa1b227428"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "phrase get by params",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/phrase",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"phrase"
+					],
+					"query": [
+						{
+							"key": "text",
+							"value": "let",
+							"disabled": true
+						},
+						{
+							"key": "lang",
+							"value": "bel",
+							"disabled": true
+						},
+						{
+							"key": "country",
+							"value": "BELARUS",
+							"disabled": true
+						},
+						{
+							"key": "number",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "phrase get by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/phrase/7203ae98-28a4-46f4-ab49-c15adbaf675d",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"phrase",
+						"7203ae98-28a4-46f4-ab49-c15adbaf675d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "phrase get count",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/phrase/count",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"phrase",
+						"count"
+					],
+					"query": [
+						{
+							"key": "text",
+							"value": "let",
+							"disabled": true
+						},
+						{
+							"key": "lang",
+							"value": "bel",
+							"disabled": true
+						},
+						{
+							"key": "country",
+							"value": "BELARUS",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pronunciation get info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/pronunciation/info/e3752c78-50bc-4e44-8d52-b65bd7186436",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"pronunciation",
+						"info",
+						"e3752c78-50bc-4e44-8d52-b65bd7186436"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pronunciation head info",
+			"request": {
+				"method": "HEAD",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8081/remember-card/v3/pronunciation/info/e3752c78-50bc-4e44-8d52-b65bd7186436",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"remember-card",
+						"v3",
+						"pronunciation",
+						"info",
+						"e3752c78-50bc-4e44-8d52-b65bd7186436"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
