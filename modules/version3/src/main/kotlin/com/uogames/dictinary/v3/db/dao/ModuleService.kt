@@ -5,6 +5,7 @@ import com.uogames.dictinary.v3.charLength
 import com.uogames.dictinary.v3.db.dao.UserService.updateUser
 import com.uogames.dictinary.v3.db.entity.*
 import com.uogames.dictinary.v3.db.entity.Module.Companion.fromEntity
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
@@ -106,6 +107,15 @@ object ModuleService {
             loaded.fromEntity()
         } else {
             null
+        }
+    }
+
+    fun Transaction.moduleBan(
+        moduleId: EntityID<UUID>,
+        ban: Boolean
+    ) {
+        ModuleEntity.findById(moduleId)?.apply {
+            this.ban = ban
         }
     }
 

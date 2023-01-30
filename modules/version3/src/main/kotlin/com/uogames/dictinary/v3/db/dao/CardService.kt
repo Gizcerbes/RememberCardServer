@@ -6,6 +6,7 @@ import com.uogames.dictinary.v3.db.dao.ImageService.cleanImage
 import com.uogames.dictinary.v3.db.dao.UserService.updateUser
 import com.uogames.dictinary.v3.db.entity.*
 import com.uogames.dictinary.v3.db.entity.Card.Companion.fromEntity
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
@@ -112,6 +113,15 @@ object CardService {
             loaded.fromEntity()
         } else {
             null
+        }
+    }
+
+    fun Transaction.cardBan(
+        cardId: EntityID<UUID>,
+        ban: Boolean
+    ){
+        CardEntity.findById(cardId)?.apply {
+            this.ban = ban
         }
     }
 

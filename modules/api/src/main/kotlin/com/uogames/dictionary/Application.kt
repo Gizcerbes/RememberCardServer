@@ -30,7 +30,7 @@ fun Application.module(testing: Boolean = false) {
             validate { credential ->
                 val stringMap = credential.payload.getClaim("stringMap").asMap() ?: return@validate null
                 val time = System.currentTimeMillis() - credential.payload.expiresAt.time
-                (time > timeLive).ifTrue {
+                if (time > timeLive) {
                     println("$time and $timeLive")
                     return@validate null
                 }
