@@ -51,7 +51,7 @@ object CardService {
             .selectAll()
             .buildWhere(text, langFirst, langSecond, countryFirst, countrySecond, first, second)
 
-        return@transaction query.first()[CardTable.id.countDistinct()].toString()
+        return@transaction query.first()[CardTable.id.countDistinct()]
     }
 
     fun get(id: UUID) = transaction {
@@ -97,7 +97,10 @@ object CardService {
 
     fun Transaction.newCard(card: Card, user: User): Card {
         updateUser(user)
-        return CardEntity.new { update(card) }.fromEntity()
+        return CardEntity.new {
+            update(card)
+            ban = false
+        }.fromEntity()
     }
 
     fun update(card: Card, user: User) = transaction {

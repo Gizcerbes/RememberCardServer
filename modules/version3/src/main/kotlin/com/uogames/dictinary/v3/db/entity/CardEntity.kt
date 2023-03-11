@@ -45,7 +45,6 @@ class CardEntity(id: EntityID<UUID>) : UUIDEntity(id) {
         timeChange = card.timeChange
         like = card.like
         dislike = card.dislike
-        ban = card.ban
     }
 
 }

@@ -73,7 +73,10 @@ object PhraseService {
 
     fun Transaction.newPhrase(phrase: Phrase, user: User): Phrase {
         updateUser(user)
-        return PhraseEntity.new { update(phrase) }.fromEntity()
+        return PhraseEntity.new {
+            update(phrase)
+            ban = false
+        }.fromEntity()
     }
 
     fun update(

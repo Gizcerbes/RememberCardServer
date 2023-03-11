@@ -36,7 +36,6 @@ fun Route.report(path:String){
                 val report = call.receiveNullable<Report>()
                     .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
                 val user = User(uid, userName)
-
                 runCatching {
                     service.register(user,report)
                     return@post call.respond(HttpStatusCode.OK)

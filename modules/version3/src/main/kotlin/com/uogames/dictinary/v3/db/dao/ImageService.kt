@@ -19,7 +19,10 @@ object ImageService {
 
     fun new(image: Image, user: User) = transaction {
         updateUser(user)
-        return@transaction ImageEntity.new { update(image) }.fromEntity()
+        return@transaction ImageEntity.new {
+            update(image)
+            ban = false
+        }.fromEntity()
     }
 
     fun update(image: Image, user: User) = transaction {

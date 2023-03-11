@@ -93,7 +93,10 @@ object ModuleService {
 
     private fun Transaction.newModule(module: Module, user: User): Module {
         updateUser(user)
-        return ModuleEntity.new { update(module) }.fromEntity()
+        return ModuleEntity.new {
+            update(module)
+            ban = false
+        }.fromEntity()
     }
 
     fun update(module: Module, user: User) = transaction {

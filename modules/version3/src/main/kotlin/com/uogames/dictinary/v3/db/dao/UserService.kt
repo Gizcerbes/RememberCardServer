@@ -18,7 +18,11 @@ object UserService {
 
     fun Transaction.updateUser(user: User) {
         UserEntity.findById(user.globalOwner).ifNull {
-            UserEntity.new(user.globalOwner) { name = "" }
+            UserEntity.new(user.globalOwner) {
+                name = ""
+                strike = 0
+                ban = false
+            }
         }.apply {
             name = user.name
         }.toUser()
