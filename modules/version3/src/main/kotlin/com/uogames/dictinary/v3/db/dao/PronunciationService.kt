@@ -19,6 +19,7 @@ object PronunciationService {
         UserService.update(user)
         return@transaction PronunciationEntity.new {
             update(pronunciation)
+            ban = false
         }.fromEntity()
     }
 

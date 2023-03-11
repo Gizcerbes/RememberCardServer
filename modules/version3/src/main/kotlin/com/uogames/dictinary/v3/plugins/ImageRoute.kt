@@ -64,7 +64,7 @@ fun Route.image(path: String) {
                     val protocol = call.request.local.scheme
                     val host = call.request.local.serverHost
                     val port = call.request.local.serverPort
-                    it.imageUri = "$protocol://$host:$port$rootPath${it.imageUri}"
+                    it.imageUri = "$protocol://$host:$port$rootPath$path${it.imageUri}"
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -81,7 +81,7 @@ fun Route.image(path: String) {
                     val protocol = call.request.local.scheme
                     val host = call.request.local.serverHost
                     val port = call.request.local.serverPort
-                    it.imageUri = "$protocol://$host:$port$rootPath${it.imageUri}"
+                    it.imageUri = "$protocol://$host:$port$rootPath$path${it.imageUri}"
                     call.respondRedirect(it.imageUri)
                 }.ifNull {
                     call.respond(HttpStatusCode.NotFound)
@@ -119,12 +119,13 @@ fun Route.image(path: String) {
                     val name = "${image.globalId}$format"
                     val os = File(dir, "/$name").outputStream().buffered()
                     call.receiveStream().use { it.copyTo(os) }
+                    os.close()
                     image.imageUri = "/image/$name"
                     service.update(image, user)?.let {
                         val protocol = call.request.local.scheme
                         val host = call.request.local.serverHost
                         val port = call.request.local.serverPort
-                        it.imageUri = "$protocol://$host:$port$rootPath${it.imageUri}"
+                        it.imageUri = "$protocol://$host:$port$rootPath$path${it.imageUri}"
                         return@post call.respond(it)
                     }.ifNull {
                         return@post call.respond(HttpStatusCode.BadRequest)

@@ -29,7 +29,7 @@ fun Route.pronunciation(path:String) {
         get("/{name}") {
             val filename = call.parameters["name"].ifNull { return@get call.respond(HttpStatusCode.NotFound) }
             val file = File(dir, "/$filename")
-            
+
             runCatching {
                 if (file.exists()) {
                     return@get call.respondFile(file)
@@ -67,7 +67,7 @@ fun Route.pronunciation(path:String) {
                     val protocol = call.request.local.scheme
                     val host = call.request.local.serverHost
                     val port = call.request.local.serverPort
-                    it.audioUri = "$protocol://$host:$port$rootPath${it.audioUri}"
+                    it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -79,12 +79,13 @@ fun Route.pronunciation(path:String) {
 
         get("/load/{id}") {
             val id = call.parameters["id"].orEmpty()
+            println(id)
             runCatching {
                 service.get(UUID.fromString(id))?.let {
                     val protocol = call.request.local.scheme
                     val host = call.request.local.serverHost
                     val port = call.request.local.serverPort
-                    it.audioUri = "$protocol://$host:$port$rootPath${it.audioUri}"
+                    it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
                     return@get call.respondRedirect(it.audioUri)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -119,12 +120,13 @@ fun Route.pronunciation(path:String) {
                     val name = "${pronounce.globalId}$format"
                     val out = File(dir, "/$name").outputStream().buffered()
                     call.receiveStream().buffered().use { it.copyTo(out) }
+                    out.close()
                     pronounce.audioUri = "/pronunciation/$name"
                     service.update(pronounce, user)?.let {
                         val protocol = call.request.local.scheme
                         val host = call.request.local.serverHost
                         val port = call.request.local.serverPort
-                        it.audioUri = "$protocol://$host:$port$rootPath${it.audioUri}"
+                        it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
                         return@post call.respond(it)
                     }.ifNull {
                         return@post call.respond(HttpStatusCode.BadRequest)

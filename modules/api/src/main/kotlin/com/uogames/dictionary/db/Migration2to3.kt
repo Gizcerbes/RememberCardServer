@@ -36,15 +36,17 @@ class Migration2to3 {
             PhraseTable,
             CardTable,
             ModuleTable,
-            ModuleCardTable
+            ModuleCardTable,
+            ReportTable
         )
         ConfigEntity.findById("version").ifNull {
-            ConfigEntity.new("version") { value = "2" }
+            ConfigEntity.new("version") { value = "3" }
         }
     }
 
     fun dropV3() = transaction {
         SchemaUtils.drop(
+            ReportTable,
             ModuleCardTable,
             ModuleTable,
             CardTable,

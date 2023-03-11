@@ -14,10 +14,10 @@ object ReportTable : UUIDTable(name = "report_table_v3") {
     val claimant = reference("claimant", UserTable.id, ReferenceOption.CASCADE)
     val message = text("message")
     val accused = reference("accused", UserTable.id, ReferenceOption.CASCADE)
+    val solved = bool("solved")
     val idPhrase = reference("id_phrase", PhraseTable.id, ReferenceOption.SET_NULL).nullable()
     val idCard = reference("id_card", CardTable.id, ReferenceOption.SET_NULL).nullable()
     val idModule = reference("id_module", ModuleTable.id, ReferenceOption.SET_NULL).nullable()
-
 }
 
 
@@ -31,6 +31,7 @@ class ReportEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var idPhrase by ReportTable.idPhrase
     var idCard by ReportTable.idCard
     var idModule by ReportTable.idModule
+    var solved by ReportTable.solved
 
 }
 
@@ -48,7 +49,9 @@ data class Report(
     @SerializedName("id_card")
     var idCard: UUID? = null,
     @SerializedName("id_module")
-    var idModule: UUID? = null
+    var idModule: UUID? = null,
+    @Transient
+    var solved: Boolean = false
 ) {
 
     companion object :TableMapper<ReportEntity, Report>{
@@ -59,7 +62,8 @@ data class Report(
             accused = row[ReportTable.accused].value,
             idPhrase = row[ReportTable.idPhrase]?.value,
             idCard = row[ReportTable.idCard]?.value,
-            idModule = row[ReportTable.idModule]?.value
+            idModule = row[ReportTable.idModule]?.value,
+            solved = row[ReportTable.solved]
         )
 
         override fun ReportEntity.fromEntity() = Report(
@@ -69,7 +73,8 @@ data class Report(
             accused = accused.value,
             idPhrase = idPhrase?.value,
             idCard = idCard?.value,
-            idModule = idModule?.value
+            idModule = idModule?.value,
+            solved = solved
         )
 
     }

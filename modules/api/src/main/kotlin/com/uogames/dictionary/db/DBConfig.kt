@@ -14,7 +14,12 @@ fun Application.initDB() {
     val dbConfig = HikariConfig(configPath)
     val dataSource = HikariDataSource(dbConfig)
     Database.connect(dataSource)
+    rename()
     create()
+}
+
+private fun rename() = transaction {
+    //db.connector().prepareStatement("alter table user_table_v4 rename to user_table_v3", false).executeQuery()
 }
 
 private fun create() = transaction {
@@ -26,4 +31,5 @@ private fun create() = transaction {
         in 3..Int.MAX_VALUE -> break
         else -> Migration2to3().createDBv3()
     }
+
 }

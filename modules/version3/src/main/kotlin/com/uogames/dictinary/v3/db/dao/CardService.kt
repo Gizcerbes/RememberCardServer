@@ -6,6 +6,7 @@ import com.uogames.dictinary.v3.db.dao.ImageService.cleanImage
 import com.uogames.dictinary.v3.db.dao.UserService.updateUser
 import com.uogames.dictinary.v3.db.entity.*
 import com.uogames.dictinary.v3.db.entity.Card.Companion.fromEntity
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
@@ -50,7 +51,7 @@ object CardService {
             .selectAll()
             .buildWhere(text, langFirst, langSecond, countryFirst, countrySecond, first, second)
 
-        return@transaction query.first()[CardTable.id.countDistinct()].toString()
+        return@transaction query.first()[CardTable.id.countDistinct()]
     }
 
     fun get(id: UUID) = transaction {
@@ -96,7 +97,10 @@ object CardService {
 
     fun Transaction.newCard(card: Card, user: User): Card {
         updateUser(user)
-        return CardEntity.new { update(card) }.fromEntity()
+        return CardEntity.new {
+            update(card)
+            ban = false
+        }.fromEntity()
     }
 
     fun update(card: Card, user: User) = transaction {
@@ -112,6 +116,15 @@ object CardService {
             loaded.fromEntity()
         } else {
             null
+        }
+    }
+
+    fun Transaction.cardBan(
+        cardId: EntityID<UUID>,
+        ban: Boolean
+    ){
+        CardEntity.findById(cardId)?.apply {
+            this.ban = ban
         }
     }
 

@@ -1,7 +1,5 @@
 package com.uogames.dictionary.plugins
 
-import com.uogames.dictionary.db.entity.v2.dao.PronunciationService
-import com.uogames.dictionary.db.entity.v2.*
 import com.uogames.dictionary.db.provider.PronounceProvider
 import com.uogames.dictionary.db.provider.dto.PronunciationDTO
 import com.uogames.dictionary.db.provider.dto.UserDTO

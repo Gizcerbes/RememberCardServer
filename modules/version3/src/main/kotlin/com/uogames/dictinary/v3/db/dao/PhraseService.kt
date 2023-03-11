@@ -10,6 +10,7 @@ import com.uogames.dictinary.v3.db.entity.Phrase.Companion.fromEntity
 import com.uogames.dictinary.v3.db.entity.PhraseEntity
 import com.uogames.dictinary.v3.db.entity.PhraseTable
 import com.uogames.dictinary.v3.db.entity.User
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
@@ -72,7 +73,10 @@ object PhraseService {
 
     fun Transaction.newPhrase(phrase: Phrase, user: User): Phrase {
         updateUser(user)
-        return PhraseEntity.new { update(phrase) }.fromEntity()
+        return PhraseEntity.new {
+            update(phrase)
+            ban = false
+        }.fromEntity()
     }
 
     fun update(
@@ -97,5 +101,13 @@ object PhraseService {
         return@transaction res
     }
 
+    fun Transaction.phraseBan(
+        phraseId: EntityID<UUID>,
+        ban: Boolean
+    ){
+        PhraseEntity.findById(phraseId)?.apply {
+            this.ban = ban
+        }
+    }
 
 }

@@ -15,6 +15,7 @@ fun Application.configV3(){
         phrase(path)
         pronunciation(path)
         users(path)
+        report(path)
     }
 
 
