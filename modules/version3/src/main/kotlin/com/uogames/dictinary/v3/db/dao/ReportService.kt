@@ -1,11 +1,6 @@
 package com.uogames.dictinary.v3.db.dao
 
 import com.uogames.dictinary.v3.addAndOp
-import com.uogames.dictinary.v3.db.dao.CardService.cardBan
-import com.uogames.dictinary.v3.db.dao.ModuleService.moduleBan
-import com.uogames.dictinary.v3.db.dao.PhraseService.phraseBan
-import com.uogames.dictinary.v3.db.dao.UserService.updateUser
-import com.uogames.dictinary.v3.db.dao.UserService.userStrike
 import com.uogames.dictinary.v3.db.entity.*
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -45,7 +40,7 @@ object ReportService {
         user: User,
         report: Report
     ) = transaction {
-        updateUser(user)
+        UserService.update(user)
         ReportEntity.new {
             claimant = UserEntity[report.claimant].id
             message = report.message
@@ -64,10 +59,10 @@ object ReportService {
         val report = ReportEntity.findById(reportID)?.apply {
             solved = true
             if (ban) {
-                userStrike(accused)
-                idPhrase?.let { phraseBan(it, true) }
-                idCard?.let { cardBan(it, true) }
-                idModule?.let { moduleBan(it, true) }
+                UserService.strike(accused)
+                idPhrase?.let { PhraseService.ban(it, true) }
+                idCard?.let { CardService.ban(it, true) }
+                idModule?.let { ModuleService.ban(it, true) }
             }
         }
     }

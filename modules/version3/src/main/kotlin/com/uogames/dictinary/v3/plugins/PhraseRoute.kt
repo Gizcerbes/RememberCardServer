@@ -1,10 +1,10 @@
 package com.uogames.dictinary.v3.plugins
 
-import com.uogames.dictinary.v3.db.dao.PhraseService
 import com.uogames.dictinary.v3.db.entity.Phrase
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.defaultUUID
 import com.uogames.dictinary.v3.ifNull
+import com.uogames.dictinary.v3.provider.PhraseProvider
 import com.uogames.dictinary.v3.toLongOrDefault
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -17,7 +17,7 @@ import java.util.*
 
 fun Route.phrase(path: String) {
 
-    val service = PhraseService
+    val service = PhraseProvider
 
     route("$path/phrase") {
 
@@ -37,10 +37,39 @@ fun Route.phrase(path: String) {
             }
         }
 
+        get("/view") {
+            val text = call.parameters["text"]
+            val language = call.parameters["lang"]
+            val country = call.parameters["country"]
+            val number = call.parameters["number"].toLongOrDefault(0)
+            runCatching {
+                service.getView(text, language, country, number)?.let {
+                    return@get call.respond(it)
+                }.ifNull {
+                    return@get call.respond(HttpStatusCode.BadRequest)
+                }
+            }.onFailure {
+                return@get call.respond(HttpStatusCode.BadRequest)
+            }
+        }
+
         get("/{id}") {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.get(UUID.fromString(id))?.let {
+                    return@get call.respond(it)
+                }.ifNull {
+                    return@get call.respond(HttpStatusCode.NotFound)
+                }
+            }.onFailure {
+                return@get call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
+            }
+        }
+
+        get("/view/{id}") {
+            val id = call.parameters["id"].orEmpty()
+            runCatching {
+                service.getView(UUID.fromString(id))?.let {
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)

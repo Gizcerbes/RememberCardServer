@@ -2,9 +2,9 @@ package com.uogames.dictionary
 
 import com.uogames.dictinary.v3.plugins.configV3
 import com.uogames.dictionary.db.initDB
-import com.uogames.dictionary.service.JWTBuilder
 import com.uogames.dictionary.plugins.configureRouting
-import com.uogames.dictionary.service.ifTrue
+import com.uogames.dictionary.service.JWTBuilder
+import com.uogames.dictionary.service.gsonWithoutExposeAnnotation
 import io.ktor.serialization.gson.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -21,7 +21,7 @@ fun Application.module(testing: Boolean = false) {
     initDB()
 
     install(ContentNegotiation) {
-        gson {}
+        gson {  }
     }
 
     val timeLive = 10000

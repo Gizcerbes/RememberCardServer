@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.uogames"
-version = "0.3.2"
+version = "0.3.4"
 application {
     mainClass.set("com.uogames.dictionary.ApplicationKt")
 
@@ -80,6 +80,5 @@ dependencies {
 
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.google.code.gson:gson:2.10")
-
 
 }

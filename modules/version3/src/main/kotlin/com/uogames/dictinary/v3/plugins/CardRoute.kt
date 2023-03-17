@@ -1,11 +1,11 @@
 package com.uogames.dictinary.v3.plugins
 
-import com.uogames.dictinary.v3.db.dao.CardService
 import com.uogames.dictinary.v3.db.entity.Card
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.defaultUUID
 import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.ifNullOrEmpty
+import com.uogames.dictinary.v3.provider.CardProvider
 import com.uogames.dictinary.v3.toLongOrDefault
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -18,7 +18,7 @@ import java.util.UUID
 
 fun Route.card(path: String) {
 
-    val provider = CardService
+    val provider = CardProvider
 
     route("$path/card") {
 
@@ -40,10 +40,41 @@ fun Route.card(path: String) {
             }
         }
 
+        get("/view") {
+            val text = call.parameters["text"]
+            val langFirst = call.parameters["lang-first"]
+            val langSecond = call.parameters["lang-second"]
+            val countryFirst = call.parameters["country-first"]
+            val countrySecond = call.parameters["country-second"]
+            val number = call.parameters["number"].toLongOrDefault(0)
+            runCatching {
+                provider.getView(text, langFirst, langSecond, countryFirst, countrySecond, number)?.let {
+                    return@get call.respond(it)
+                }.ifNull{
+                    return@get call.respond(HttpStatusCode.BadRequest)
+                }
+            }.onFailure {
+                return@get call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
+            }
+        }
+
         get("/{id}") {
             val id = call.parameters["id"].ifNullOrEmpty { return@get call.respond(HttpStatusCode.BadRequest) }
             runCatching {
                 provider.get(UUID.fromString(id))?.let {
+                    return@get call.respond(it)
+                }.ifNull {
+                    return@get call.respond(HttpStatusCode.NotFound)
+                }
+            }.onFailure {
+                return@get call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
+            }
+        }
+
+        get("/view/{id}") {
+            val id = call.parameters["id"].ifNullOrEmpty { return@get call.respond(HttpStatusCode.BadRequest) }
+            runCatching {
+                provider.getView(UUID.fromString(id))?.let {
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)

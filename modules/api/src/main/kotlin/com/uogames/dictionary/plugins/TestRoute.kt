@@ -1,8 +1,10 @@
 package com.uogames.dictionary.plugins
 
-import com.uogames.dictionary.db.entity.v2.dao.ModuleService
+import com.uogames.dictinary.v3.db.entity.Phrase
+import com.uogames.dictinary.v3.ifNull
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.util.*
@@ -29,6 +31,18 @@ fun Route.test() {
             if (res == null) call.respond(HttpStatusCode.BadRequest)
             else call.respond(res)
         }
+
+        post {
+            val phrase = call.receiveNullable<Phrase>()
+            println(phrase)
+            phrase?.let {
+                call.respond(it)
+            }.ifNull {
+                call.respond(HttpStatusCode.BadRequest)
+            }
+            //call.respond(phrase)
+        }
+
 
     }
 

@@ -1,9 +1,9 @@
 package com.uogames.dictinary.v3.plugins
 
-import com.uogames.dictinary.v3.db.dao.ImageService
 import com.uogames.dictinary.v3.db.entity.Image
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.ifNull
+import com.uogames.dictinary.v3.provider.ImageProvider
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -20,7 +20,7 @@ fun Route.image(path: String) {
     val rootPath = environment?.rootPath ?: ""
     val dir = environment?.config?.property("ktor.rootDir")?.getString() + "/images"
     val format = ".png"
-    val service = ImageService
+    val service = ImageProvider
     File(dir).mkdirs()
 
     route("$path/image") {
@@ -61,6 +61,23 @@ fun Route.image(path: String) {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.get(UUID.fromString(id))?.let {
+                    val protocol = call.request.local.scheme
+                    val host = call.request.local.serverHost
+                    val port = call.request.local.serverPort
+                    it.imageUri = "$protocol://$host:$port$rootPath$path${it.imageUri}"
+                    return@get call.respond(it)
+                }.ifNull {
+                    return@get call.respond(HttpStatusCode.NotFound)
+                }
+            }.onFailure {
+                return@get call.respond(status = HttpStatusCode.BadRequest, message = it.message.toString())
+            }
+        }
+
+        get("/info/view/{id}") {
+            val id = call.parameters["id"].orEmpty()
+            runCatching {
+                service.getView(UUID.fromString(id))?.let {
                     val protocol = call.request.local.scheme
                     val host = call.request.local.serverHost
                     val port = call.request.local.serverPort
