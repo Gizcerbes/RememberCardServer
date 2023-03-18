@@ -12,4 +12,6 @@
     <logger name="com.zaxxer.hikari.pool.HikariPool" level="ERROR"/>
     <logger name="io.ktor.routing.Routing" level="ERROR"/>
     <logger name="io.ktor.server.plugins.contentnegotiation.ContentNegotiation" level="ERROR"/>
+    <logger name="io.ktor.server.auth.Authentication" level="ERROR"/>
+    <logger name="io.ktor.server.engine.DefaultTransform" level="ERROR"/>
 </configuration>

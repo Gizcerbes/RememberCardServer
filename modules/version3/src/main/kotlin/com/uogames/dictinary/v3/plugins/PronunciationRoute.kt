@@ -1,9 +1,11 @@
 package com.uogames.dictinary.v3.plugins
 
+import com.uogames.dictinary.v3.buildPath
 import com.uogames.dictinary.v3.db.dao.PronunciationService
 import com.uogames.dictinary.v3.db.entity.Pronunciation
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.ifNull
+import com.uogames.dictinary.v3.provider.PronunciationProvider
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -20,7 +22,7 @@ fun Route.pronunciation(path:String) {
     val rootPath = environment?.rootPath ?: ""
     val dir = environment?.config?.property("ktor.rootDir")?.getString() + "/pronounce"
     val format = ".mp4"
-    val service = PronunciationService
+    val service = PronunciationProvider
     File(dir).mkdirs()
 
     route("$path/pronunciation") {
@@ -64,10 +66,21 @@ fun Route.pronunciation(path:String) {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.get(UUID.fromString(id))?.let {
-                    val protocol = call.request.local.scheme
-                    val host = call.request.local.serverHost
-                    val port = call.request.local.serverPort
-                    it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
+                    it.apply { audioUri = buildPath("$rootPath$path$audioUri") }
+                    return@get call.respond(it)
+                }.ifNull {
+                    return@get call.respond(HttpStatusCode.NotFound)
+                }
+            }.onFailure {
+                return@get call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
+            }
+        }
+
+        get("/info/view/{id}") {
+            val id = call.parameters["id"].orEmpty()
+            runCatching {
+                service.getView(UUID.fromString(id))?.let {
+                    it.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -79,13 +92,9 @@ fun Route.pronunciation(path:String) {
 
         get("/load/{id}") {
             val id = call.parameters["id"].orEmpty()
-            println(id)
             runCatching {
                 service.get(UUID.fromString(id))?.let {
-                    val protocol = call.request.local.scheme
-                    val host = call.request.local.serverHost
-                    val port = call.request.local.serverPort
-                    it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
+                    it.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respondRedirect(it.audioUri)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -123,10 +132,7 @@ fun Route.pronunciation(path:String) {
                     out.close()
                     pronounce.audioUri = "/pronunciation/$name"
                     service.update(pronounce, user)?.let {
-                        val protocol = call.request.local.scheme
-                        val host = call.request.local.serverHost
-                        val port = call.request.local.serverPort
-                        it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
+                        it.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                         return@post call.respond(it)
                     }.ifNull {
                         return@post call.respond(HttpStatusCode.BadRequest)

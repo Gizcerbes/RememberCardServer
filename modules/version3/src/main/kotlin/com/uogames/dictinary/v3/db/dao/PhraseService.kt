@@ -4,17 +4,17 @@ import com.uogames.dictinary.v3.addAndOp
 import com.uogames.dictinary.v3.charLength
 import com.uogames.dictinary.v3.db.dao.ImageService.cleanImage
 import com.uogames.dictinary.v3.db.dao.PronunciationService.cleanPronunciation
-import com.uogames.dictinary.v3.db.dao.UserService.updateUser
 import com.uogames.dictinary.v3.db.entity.Phrase
 import com.uogames.dictinary.v3.db.entity.Phrase.Companion.fromEntity
 import com.uogames.dictinary.v3.db.entity.PhraseEntity
 import com.uogames.dictinary.v3.db.entity.PhraseTable
 import com.uogames.dictinary.v3.db.entity.User
+import com.uogames.dictinary.v3.ifNull
+import com.uogames.dictinary.v3.views.PhraseView
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
 object PhraseService {
@@ -34,18 +34,38 @@ object PhraseService {
         text: String? = null,
         language: String? = null,
         country: String? = null
-    ) = transaction {
+    ): Long {
         val query = PhraseTable
             .slice(PhraseTable.id.countDistinct())
             .selectAll()
             .buildWhere(text, language, country)
 
-        return@transaction query.first()[PhraseTable.id.countDistinct()]
+        return query.first()[PhraseTable.id.countDistinct()]
     }
 
 
-    fun get(id: UUID) = transaction {
-        return@transaction PhraseEntity.findById(id)?.fromEntity()
+    fun get(id: UUID) = PhraseEntity.findById(id)?.fromEntity()
+
+    private fun getQuery(
+        text: String? = null,
+        language: String? = null,
+        country: String? = null,
+        number: Long
+    ): Query {
+        val lenPhrase = PhraseTable.phrase.charLength().alias("len")
+        val columns = ArrayList<Expression<*>>().apply {
+            addAll(PhraseTable.columns)
+            add(lenPhrase)
+        }
+        return PhraseTable
+            .slice(columns)
+            .selectAll()
+            .buildWhere(text, language, country)
+            .orderBy(
+                lenPhrase to SortOrder.ASC,
+                PhraseTable.phrase to SortOrder.ASC
+            )
+            .limit(1, number)
     }
 
     fun get(
@@ -53,26 +73,21 @@ object PhraseService {
         language: String? = null,
         country: String? = null,
         number: Long
-    ) = transaction {
-        val lenPhrase = PhraseTable.phrase.charLength().alias("len")
-        val columns = ArrayList<Expression<*>>().apply {
-            addAll(PhraseTable.columns)
-            add(lenPhrase)
-        }
-        val query = PhraseTable
-            .slice(columns)
-            .selectAll()
-            .buildWhere(text, language, country)
-            .orderBy(lenPhrase)
-            .limit(1, number)
+    ) = getQuery(text, language, country, number).firstOrNull()?.let { Phrase.fromRow(it) }
 
-        return@transaction query.firstOrNull()?.let { Phrase.fromRow(it) }
-    }
+    fun getView(eID: EntityID<UUID>) = PhraseEntity[eID].let { PhraseView.fromEntity(it) }
 
-    fun new(phrase: Phrase, user: User) = transaction { newPhrase(phrase, user) }
+    fun getView(id: UUID) = PhraseEntity.findById(id)?.let { PhraseView.fromEntity(it) }
 
-    fun Transaction.newPhrase(phrase: Phrase, user: User): Phrase {
-        updateUser(user)
+    fun getView(
+        text: String? = null,
+        language: String? = null,
+        country: String? = null,
+        number: Long
+    ) = getQuery(text, language, country, number).firstOrNull()?.let { PhraseView.fromRow(it) }
+
+    fun new(phrase: Phrase, user: User): Phrase {
+        UserService.update(user)
         return PhraseEntity.new {
             update(phrase)
             ban = false
@@ -82,32 +97,26 @@ object PhraseService {
     fun update(
         phrase: Phrase,
         user: User
-    ) = transaction {
+    ): Phrase {
         val loaded = PhraseEntity.findById(phrase.globalId)
-        val res = if (loaded == null) {
-            newPhrase(phrase, user)
-        } else if (loaded.globalOwner.value == user.globalOwner) {
-            updateUser(user)
+        return loaded?.let {
+            UserService.update(user)
             val oldImage = loaded.idImage?.value
             val oldPronounce = loaded.idPronounce?.value
             loaded.update(phrase)
-            commit()
             if (oldImage != null && oldImage != phrase.idImage) cleanImage(oldImage)
             if (oldPronounce != null && oldPronounce != phrase.idPronounce) cleanPronunciation(oldPronounce)
             loaded.fromEntity()
-        } else {
-            null
+        }.ifNull {
+            new(phrase, user)
         }
-        return@transaction res
     }
 
-    fun Transaction.phraseBan(
+    fun ban(
         phraseId: EntityID<UUID>,
         ban: Boolean
-    ){
-        PhraseEntity.findById(phraseId)?.apply {
-            this.ban = ban
-        }
+    ) {
+        PhraseEntity[phraseId].apply { this.ban = ban }
     }
 
 }

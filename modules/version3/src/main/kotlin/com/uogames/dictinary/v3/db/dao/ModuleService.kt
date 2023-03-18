@@ -2,9 +2,9 @@ package com.uogames.dictinary.v3.db.dao
 
 import com.uogames.dictinary.v3.addAndOp
 import com.uogames.dictinary.v3.charLength
-import com.uogames.dictinary.v3.db.dao.UserService.updateUser
 import com.uogames.dictinary.v3.db.entity.*
 import com.uogames.dictinary.v3.db.entity.Module.Companion.fromEntity
+import com.uogames.dictinary.v3.views.ModuleView
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -37,7 +37,7 @@ object ModuleService {
         langSecond: String? = null,
         countryFirst: String? = null,
         countrySecond: String? = null
-    ) = transaction {
+    ): Long {
         val first = PhraseTable.alias("pt1")
         val second = PhraseTable.alias("pt2")
 
@@ -50,21 +50,17 @@ object ModuleService {
             .selectAll()
             .buildWhere(text, langFirst, langSecond, countryFirst, countrySecond, first, second)
 
-        return@transaction query.first()[ModuleTable.id.countDistinct()]
+        return query.first()[ModuleTable.id.countDistinct()]
     }
 
-    fun get(id: UUID) = transaction {
-        return@transaction ModuleEntity.findById(id)?.fromEntity()
-    }
-
-    fun get(
+    private fun getQuery(
         text: String? = null,
         langFirst: String? = null,
         langSecond: String? = null,
         countryFirst: String? = null,
         countrySecond: String? = null,
         number: Long
-    ) = transaction {
+    ): Query {
         val first = PhraseTable.alias("pt1")
         val second = PhraseTable.alias("pt2")
         val lengthAlias = ModuleTable.name.charLength().alias("len")
@@ -74,7 +70,7 @@ object ModuleService {
             add(lengthAlias)
         }
 
-        val query = ModuleTable
+        return ModuleTable
             .join(ModuleCardTable, JoinType.LEFT, ModuleTable.id, ModuleCardTable.moduleId)
             .join(CardTable, JoinType.LEFT, ModuleCardTable.cardId, CardTable.id)
             .join(first, JoinType.LEFT, CardTable.idPhrase, first[PhraseTable.id])
@@ -82,29 +78,66 @@ object ModuleService {
             .slice(columns)
             .selectAll()
             .buildWhere(text, langFirst, langSecond, countryFirst, countrySecond, first, second)
-            .orderBy(lengthAlias to SortOrder.ASC)
+            .orderBy(
+                lengthAlias to SortOrder.ASC,
+                ModuleTable.name to SortOrder.ASC
+            )
             .limit(1, number)
             .withDistinct()
-
-        return@transaction query.firstOrNull()?.let { Module.fromRow(it) }
     }
 
-    fun new(module: Module, user: User) = transaction { newModule(module, user) }
+    fun get(id: UUID) = ModuleEntity.findById(id)?.fromEntity()
 
-    private fun Transaction.newModule(module: Module, user: User): Module {
-        updateUser(user)
+
+    fun get(
+        text: String? = null,
+        langFirst: String? = null,
+        langSecond: String? = null,
+        countryFirst: String? = null,
+        countrySecond: String? = null,
+        number: Long
+    ) = getQuery(
+        text = text,
+        langFirst = langFirst,
+        langSecond = langSecond,
+        countryFirst = countryFirst,
+        countrySecond = countrySecond,
+        number = number
+    ).firstOrNull()?.let { Module.fromRow(it) }
+
+    fun getView(
+        text: String? = null,
+        langFirst: String? = null,
+        langSecond: String? = null,
+        countryFirst: String? = null,
+        countrySecond: String? = null,
+        number: Long
+    ) = getQuery(
+        text = text,
+        langFirst = langFirst,
+        langSecond = langSecond,
+        countryFirst = countryFirst,
+        countrySecond = countrySecond,
+        number = number
+    ).firstOrNull()?.let { ModuleView.fromRow(it) }
+
+    fun getView(eID: EntityID<UUID>) = ModuleEntity[eID].let { ModuleView.fromEntity(it) }
+    fun getView(id: UUID) = ModuleEntity.findById(id)?.let { ModuleView.fromEntity(it) }
+
+    fun new(module: Module, user: User): Module {
+        UserService.update(user)
         return ModuleEntity.new {
             update(module)
             ban = false
         }.fromEntity()
     }
 
-    fun update(module: Module, user: User) = transaction {
+    fun update(module: Module, user: User): Module? {
         val loaded = ModuleEntity.findById(module.globalId)
-        return@transaction if (loaded == null) {
-            newModule(module, user)
+        return if (loaded == null) {
+            new(module, user)
         } else if (loaded.globalOwner.value == user.globalOwner) {
-            updateUser(user)
+            UserService.update(user)
             ModuleCardTable.deleteWhere { moduleId eq module.globalId }
             loaded.update(module)
             loaded.fromEntity()
@@ -113,7 +146,7 @@ object ModuleService {
         }
     }
 
-    fun Transaction.moduleBan(
+    fun ban(
         moduleId: EntityID<UUID>,
         ban: Boolean
     ) {

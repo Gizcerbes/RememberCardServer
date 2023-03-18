@@ -1,13 +1,14 @@
 package com.uogames.dictinary.v3.db.entity
 
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import com.uogames.dictinary.v3.views.UserView
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.Transaction
 
 object UserTable : IdTable<String>("user_table_v3") {
     override val id: Column<EntityID<String>> = varchar("global_owner", 100).entityId()
@@ -38,12 +39,12 @@ data class User(
     @SerializedName("name")
     val name: String = "",
     @Transient
-    val strike:Int = 0,
+    val strike: Int = 0,
     @Transient
-    val ban:Boolean = false
-){
+    val ban: Boolean = false
+) {
 
-    companion object:TableMapper<UserEntity, User>{
+    companion object : TableMapper<UserEntity, User> {
         override fun fromRow(row: ResultRow) = User(
             globalOwner = row[UserTable.id].value,
             name = row[UserTable.name],
@@ -51,7 +52,7 @@ data class User(
             ban = row[UserTable.ban]
         )
 
-        override fun UserEntity.fromEntity()= User(
+        override fun UserEntity.fromEntity() = User(
             globalOwner = id.value,
             name = name,
             strike = strike,

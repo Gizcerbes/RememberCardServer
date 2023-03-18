@@ -1,6 +1,5 @@
 package com.uogames.dictinary.v3.db.entity
 
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass

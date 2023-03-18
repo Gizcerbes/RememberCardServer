@@ -1,10 +1,11 @@
 package com.uogames.dictinary.v3.plugins
 
-import com.uogames.dictinary.v3.db.dao.ModuleCardService
+import com.uogames.dictinary.v3.buildPath
 import com.uogames.dictinary.v3.db.entity.ModuleCard
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.defaultUUID
 import com.uogames.dictinary.v3.ifNull
+import com.uogames.dictinary.v3.provider.ModuleCardProvider
 import com.uogames.dictinary.v3.toLongOrDefault
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -18,7 +19,9 @@ import java.util.UUID
 
 fun Route.moduleCard(path:String) {
 
-    val service = ModuleCardService
+    val rootPath = environment?.rootPath ?: ""
+
+    val service = ModuleCardProvider
 
     route("$path/module-card") {
 
@@ -36,10 +39,47 @@ fun Route.moduleCard(path:String) {
             }
         }
 
+        get("/view") {
+            val moduleID = call.parameters["module-id"].orEmpty()
+            val number = call.parameters["number"].toLongOrDefault(0)
+            runCatching {
+                service.getView(UUID.fromString(moduleID), number)?.let {
+                    it.card.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.phrase.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.phrase.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
+                    it.card.translate.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.translate.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
+                    return@get call.respond(it)
+                }.ifNull{
+                    return@get call.respond(HttpStatusCode.NotFound)
+                }
+            }.onFailure {
+                return@get call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
+            }
+        }
+
         get("/{id}") {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.get(UUID.fromString(id))?.let {
+                    return@get call.respond(it)
+                }.ifNull{
+                    return@get call.respond(HttpStatusCode.NotFound)
+                }
+            }.onFailure {
+                return@get call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
+            }
+        }
+
+        get("/view/{id}") {
+            val id = call.parameters["id"].orEmpty()
+            runCatching {
+                service.getView(UUID.fromString(id))?.let {
+                    it.card.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.phrase.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.phrase.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
+                    it.card.translate.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.translate.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull{
                     return@get call.respond(HttpStatusCode.NotFound)
