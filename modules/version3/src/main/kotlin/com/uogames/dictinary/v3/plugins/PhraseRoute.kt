@@ -1,5 +1,6 @@
 package com.uogames.dictinary.v3.plugins
 
+import com.uogames.dictinary.v3.buildPath
 import com.uogames.dictinary.v3.db.entity.Phrase
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.defaultUUID
@@ -16,6 +17,8 @@ import io.ktor.server.routing.*
 import java.util.*
 
 fun Route.phrase(path: String) {
+
+    val rootPath = environment?.rootPath ?: ""
 
     val service = PhraseProvider
 
@@ -44,6 +47,8 @@ fun Route.phrase(path: String) {
             val number = call.parameters["number"].toLongOrDefault(0)
             runCatching {
                 service.getView(text, language, country, number)?.let {
+                    it.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.BadRequest)
@@ -70,6 +75,8 @@ fun Route.phrase(path: String) {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.getView(UUID.fromString(id))?.let {
+                    it.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)

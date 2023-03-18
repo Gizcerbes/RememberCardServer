@@ -1,5 +1,6 @@
 package com.uogames.dictinary.v3.plugins
 
+import com.uogames.dictinary.v3.buildPath
 import com.uogames.dictinary.v3.db.dao.PronunciationService
 import com.uogames.dictinary.v3.db.entity.Pronunciation
 import com.uogames.dictinary.v3.db.entity.User
@@ -65,10 +66,7 @@ fun Route.pronunciation(path:String) {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.get(UUID.fromString(id))?.let {
-                    val protocol = call.request.local.scheme
-                    val host = call.request.local.serverHost
-                    val port = call.request.local.serverPort
-                    it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
+                    it.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -82,10 +80,7 @@ fun Route.pronunciation(path:String) {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.getView(UUID.fromString(id))?.let {
-                    val protocol = call.request.local.scheme
-                    val host = call.request.local.serverHost
-                    val port = call.request.local.serverPort
-                    it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
+                    it.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -99,10 +94,7 @@ fun Route.pronunciation(path:String) {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.get(UUID.fromString(id))?.let {
-                    val protocol = call.request.local.scheme
-                    val host = call.request.local.serverHost
-                    val port = call.request.local.serverPort
-                    it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
+                    it.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respondRedirect(it.audioUri)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -140,10 +132,7 @@ fun Route.pronunciation(path:String) {
                     out.close()
                     pronounce.audioUri = "/pronunciation/$name"
                     service.update(pronounce, user)?.let {
-                        val protocol = call.request.local.scheme
-                        val host = call.request.local.serverHost
-                        val port = call.request.local.serverPort
-                        it.audioUri = "$protocol://$host:$port$rootPath$path${it.audioUri}"
+                        it.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                         return@post call.respond(it)
                     }.ifNull {
                         return@post call.respond(HttpStatusCode.BadRequest)

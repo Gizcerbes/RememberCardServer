@@ -18,7 +18,7 @@ data class ModuleCardView(
     @SerializedName("module")
     var idModule: ModuleView,
     @SerializedName("card")
-    var idCard: CardView
+    var card: CardView
 ) {
 
     companion object : ViewMapper<ModuleCardEntity, ModuleCardView> {
@@ -26,12 +26,12 @@ data class ModuleCardView(
             globalId = row[ModuleCardTable.id].value,
             user = row[ModuleCardTable.globalOwner].let { UserService.getView(it) },
             idModule = row[ModuleCardTable.moduleId].let { ModuleService.getView(it) },
-            idCard = row[ModuleCardTable.cardId].let { CardService.getView(it) }
+            card = row[ModuleCardTable.cardId].let { CardService.getView(it) }
         )
 
         override fun fromEntity(entity: ModuleCardEntity) = ModuleCardView(
             idModule = entity.moduleId.let { ModuleService.getView(it) },
-            idCard = entity.cardId.let { CardService.getView(it) },
+            card = entity.cardId.let { CardService.getView(it) },
             globalId = entity.id.value,
             user = entity.globalOwner.let { UserService.getView(it) }
         )

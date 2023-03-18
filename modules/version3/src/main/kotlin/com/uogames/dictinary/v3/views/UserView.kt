@@ -10,22 +10,18 @@ data class UserView(
     @SerializedName("global_owner")
     val globalOwner: String,
     @SerializedName("name")
-    val name: String = "",
-    @Transient
-    val strike:Int = 0
+    val name: String = ""
 ){
     companion object : ViewMapper<UserEntity, UserView> {
         override fun fromRow(row: ResultRow) = UserView(
             globalOwner = row[UserTable.id].value,
-            name = row[UserTable.name],
-            strike = row[UserTable.strike]
+            name = row[UserTable.name]
         )
 
 
         override fun fromEntity(entity: UserEntity) = UserView(
             globalOwner = entity.id.value,
-            name = entity.name,
-            strike = entity.strike
+            name = entity.name
         )
 
     }

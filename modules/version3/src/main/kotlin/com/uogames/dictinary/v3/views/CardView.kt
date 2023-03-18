@@ -6,7 +6,6 @@ import com.uogames.dictinary.v3.db.dao.PhraseService
 import com.uogames.dictinary.v3.db.dao.UserService
 import com.uogames.dictinary.v3.db.entity.CardEntity
 import com.uogames.dictinary.v3.db.entity.CardTable
-import com.uogames.dictinary.v3.db.entity.UserEntity
 import com.uogames.dictinary.v3.db.entity.ViewMapper
 import org.jetbrains.exposed.sql.ResultRow
 import java.util.*
@@ -17,11 +16,11 @@ data class CardView(
     @SerializedName("user")
     var user: UserView,
     @SerializedName("phrase")
-    var idPhrase: PhraseView,
+    var phrase: PhraseView,
     @SerializedName("translate")
-    var idTranslate: PhraseView,
+    var translate: PhraseView,
     @SerializedName("image")
-    var idImage: ImageView? = null,
+    var image: ImageView? = null,
     @SerializedName("reason")
     var reason: String = "",
     @SerializedName("time_change")
@@ -36,9 +35,9 @@ data class CardView(
         override fun fromRow(row: ResultRow)= CardView(
             globalId = row[CardTable.id].value,
             user = row[CardTable.globalOwner].let { UserService.getView(it) },
-            idPhrase =  row[CardTable.idPhrase].let { PhraseService.getView(it) },
-            idTranslate = row[CardTable.idTranslate].let { PhraseService.getView(it) },
-            idImage = row[CardTable.idImage]?.let { ImageService.getView(it) },
+            phrase =  row[CardTable.idPhrase].let { PhraseService.getView(it) },
+            translate = row[CardTable.idTranslate].let { PhraseService.getView(it) },
+            image = row[CardTable.idImage]?.let { ImageService.getView(it) },
             reason = row[CardTable.reason],
             timeChange = row[CardTable.timeChange],
             like = row[CardTable.like],
@@ -48,9 +47,9 @@ data class CardView(
         override fun fromEntity(entity: CardEntity) = CardView(
             globalId = entity.id.value,
             user = entity.globalOwner.let { UserService.getView(it) },
-            idPhrase = entity.idPhrase.let { PhraseService.getView(it) },
-            idTranslate = entity.idTranslate.let { PhraseService.getView(it) },
-            idImage = entity.idImage?.let { ImageService.getView(it) },
+            phrase = entity.idPhrase.let { PhraseService.getView(it) },
+            translate = entity.idTranslate.let { PhraseService.getView(it) },
+            image = entity.idImage?.let { ImageService.getView(it) },
             reason = entity.reason,
             timeChange = entity.timeChange,
             like = entity.like,

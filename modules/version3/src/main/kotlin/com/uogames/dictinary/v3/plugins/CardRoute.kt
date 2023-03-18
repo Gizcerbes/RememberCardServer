@@ -1,12 +1,9 @@
 package com.uogames.dictinary.v3.plugins
 
+import com.uogames.dictinary.v3.*
 import com.uogames.dictinary.v3.db.entity.Card
 import com.uogames.dictinary.v3.db.entity.User
-import com.uogames.dictinary.v3.defaultUUID
-import com.uogames.dictinary.v3.ifNull
-import com.uogames.dictinary.v3.ifNullOrEmpty
 import com.uogames.dictinary.v3.provider.CardProvider
-import com.uogames.dictinary.v3.toLongOrDefault
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -18,6 +15,7 @@ import java.util.UUID
 
 fun Route.card(path: String) {
 
+    val rootPath = environment?.rootPath ?: ""
     val provider = CardProvider
 
     route("$path/card") {
@@ -49,6 +47,11 @@ fun Route.card(path: String) {
             val number = call.parameters["number"].toLongOrDefault(0)
             runCatching {
                 provider.getView(text, langFirst, langSecond, countryFirst, countrySecond, number)?.let {
+                    it.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.phrase.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.phrase.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
+                    it.translate.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.translate.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull{
                     return@get call.respond(HttpStatusCode.BadRequest)
@@ -75,6 +78,11 @@ fun Route.card(path: String) {
             val id = call.parameters["id"].ifNullOrEmpty { return@get call.respond(HttpStatusCode.BadRequest) }
             runCatching {
                 provider.getView(UUID.fromString(id))?.let {
+                    it.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.phrase.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.phrase.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
+                    it.translate.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.translate.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)

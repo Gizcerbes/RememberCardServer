@@ -1,5 +1,6 @@
 package com.uogames.dictinary.v3.plugins
 
+import com.uogames.dictinary.v3.buildPath
 import com.uogames.dictinary.v3.db.entity.ModuleCard
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.defaultUUID
@@ -17,6 +18,8 @@ import java.util.UUID
 
 
 fun Route.moduleCard(path:String) {
+
+    val rootPath = environment?.rootPath ?: ""
 
     val service = ModuleCardProvider
 
@@ -41,6 +44,11 @@ fun Route.moduleCard(path:String) {
             val number = call.parameters["number"].toLongOrDefault(0)
             runCatching {
                 service.getView(UUID.fromString(moduleID), number)?.let {
+                    it.card.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.phrase.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.phrase.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
+                    it.card.translate.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.translate.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull{
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -67,6 +75,11 @@ fun Route.moduleCard(path:String) {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.getView(UUID.fromString(id))?.let {
+                    it.card.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.phrase.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.phrase.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
+                    it.card.translate.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.card.translate.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
                 }.ifNull{
                     return@get call.respond(HttpStatusCode.NotFound)

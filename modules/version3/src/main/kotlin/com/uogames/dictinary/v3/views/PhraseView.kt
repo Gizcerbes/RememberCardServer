@@ -24,9 +24,9 @@ data class PhraseView(
     @SerializedName("country")
     var country: String = "BELARUS",
     @SerializedName("pronounce")
-    var idPronounce: PronunciationView? = null,
+    var pronounce: PronunciationView? = null,
     @SerializedName("image")
-    var idImage: ImageView? = null,
+    var image: ImageView? = null,
     @SerializedName("time_change")
     var timeChange: Long = 0,
     @SerializedName("like")
@@ -44,8 +44,8 @@ data class PhraseView(
                 definition = row[PhraseTable.definition],
                 lang = row[PhraseTable.lang],
                 country = row[PhraseTable.country],
-                idPronounce = row[PhraseTable.idPronounce]?.let { PronunciationService.getView(it) },
-                idImage = row[PhraseTable.idImage]?.let { ImageService.getView(it) },
+                pronounce = row[PhraseTable.idPronounce]?.let { PronunciationService.getView(it) },
+                image = row[PhraseTable.idImage]?.let { ImageService.getView(it) },
                 timeChange = row[PhraseTable.timeChange],
                 like = row[PhraseTable.like],
                 dislike = row[PhraseTable.dislike]
@@ -57,8 +57,8 @@ data class PhraseView(
                 phrase = entity.phrase,
                 definition = entity.definition,
                 lang = entity.lang,
-                idPronounce = entity.idPronounce?.let { PronunciationService.getView(it) },
-                idImage = entity.idImage?.let { ImageService.getView(it) },
+                pronounce = entity.idPronounce?.let { PronunciationService.getView(it) },
+                image = entity.idImage?.let { ImageService.getView(it) },
                 timeChange = entity.timeChange,
                 like = entity.like,
                 dislike = entity.dislike,

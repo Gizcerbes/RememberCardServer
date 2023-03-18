@@ -1,5 +1,6 @@
 package com.uogames.dictinary.v3.plugins
 
+import com.uogames.dictinary.v3.buildPath
 import com.uogames.dictinary.v3.db.entity.Image
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.ifNull
@@ -61,10 +62,7 @@ fun Route.image(path: String) {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.get(UUID.fromString(id))?.let {
-                    val protocol = call.request.local.scheme
-                    val host = call.request.local.serverHost
-                    val port = call.request.local.serverPort
-                    it.imageUri = "$protocol://$host:$port$rootPath$path${it.imageUri}"
+                    it.apply { imageUri = buildPath("$rootPath$path$imageUri") }
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -78,10 +76,7 @@ fun Route.image(path: String) {
             val id = call.parameters["id"].orEmpty()
             runCatching {
                 service.getView(UUID.fromString(id))?.let {
-                    val protocol = call.request.local.scheme
-                    val host = call.request.local.serverHost
-                    val port = call.request.local.serverPort
-                    it.imageUri = "$protocol://$host:$port$rootPath$path${it.imageUri}"
+                    it.apply { imageUri = buildPath("$rootPath$path$imageUri") }
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -95,10 +90,7 @@ fun Route.image(path: String) {
             val id = call.parameters["id"].ifNull { return@get call.respond(HttpStatusCode.BadRequest) }
             runCatching {
                 service.get(UUID.fromString(id))?.let {
-                    val protocol = call.request.local.scheme
-                    val host = call.request.local.serverHost
-                    val port = call.request.local.serverPort
-                    it.imageUri = "$protocol://$host:$port$rootPath$path${it.imageUri}"
+                    it.apply { imageUri = buildPath("$rootPath$path$imageUri") }
                     call.respondRedirect(it.imageUri)
                 }.ifNull {
                     call.respond(HttpStatusCode.NotFound)
@@ -139,10 +131,7 @@ fun Route.image(path: String) {
                     os.close()
                     image.imageUri = "/image/$name"
                     service.update(image, user)?.let {
-                        val protocol = call.request.local.scheme
-                        val host = call.request.local.serverHost
-                        val port = call.request.local.serverPort
-                        it.imageUri = "$protocol://$host:$port$rootPath$path${it.imageUri}"
+                        it.apply { imageUri = buildPath("$rootPath$path$imageUri") }
                         return@post call.respond(it)
                     }.ifNull {
                         return@post call.respond(HttpStatusCode.BadRequest)
