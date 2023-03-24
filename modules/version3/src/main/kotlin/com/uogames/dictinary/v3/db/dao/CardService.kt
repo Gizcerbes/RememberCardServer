@@ -69,9 +69,9 @@ object CardService {
         val phraseFirst = first[PhraseTable.phrase].alias("p")
         val phraseSecond = second[PhraseTable.phrase].alias("t")
 
-        val firstOrder = sLenAlias to SortOrder.ASC
+        val firstOrder = fLenAlias to SortOrder.ASC
         val firstSort = phraseFirst to SortOrder.ASC
-        val secondOrder = fLenAlias to SortOrder.ASC
+        val secondOrder = sLenAlias to SortOrder.ASC
         val secondSort = phraseSecond to SortOrder.ASC
 
         val columns = ArrayList<Expression<*>>().apply {

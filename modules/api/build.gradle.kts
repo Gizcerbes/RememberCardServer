@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.uogames"
-version = "0.3.4"
+version = "0.3.5"
 application {
     mainClass.set("com.uogames.dictionary.ApplicationKt")
 
