@@ -25,6 +25,7 @@ object PronunciationService {
         UserService.update(user)
         val uuid = if (pronunciation.globalId != defaultUUID) pronunciation.globalId else null
         return PronunciationEntity.new(uuid) {
+            if (pronunciation.globalOwner.isEmpty()) pronunciation.globalOwner = user.globalOwner
             update(pronunciation)
             ban = false
         }.fromEntity()

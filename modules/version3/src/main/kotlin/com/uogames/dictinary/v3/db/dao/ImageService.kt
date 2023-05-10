@@ -23,8 +23,8 @@ object ImageService {
         UserService.update(user)
         val uuid = if (image.globalId != defaultUUID) image.globalId else null
         return ImageEntity.new(uuid) {
-            if (image.globalOwner.isEmpty()) update(Image(image.globalId, user.globalOwner, image.imageUri))
-            else update(image)
+            if (image.globalOwner.isEmpty()) image.globalOwner = user.globalOwner
+            update(image)
             ban = false
         }.fromEntity()
     }

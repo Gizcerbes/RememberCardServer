@@ -36,6 +36,7 @@ object ModuleCardService {
         UserService.update(user)
         val uuid = if (moduleCard.globalId != defaultUUID) moduleCard.globalId else null
         return ModuleCardEntity.new(uuid) {
+            if (moduleCard.globalOwner.isEmpty()) moduleCard.globalOwner = user.globalOwner
             update(moduleCard)
         }.fromEntity()
     }

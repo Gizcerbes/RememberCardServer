@@ -143,6 +143,7 @@ object CardService {
         UserService.update(user)
         val uuid = if (card.globalId != defaultUUID) card.globalId else null
         return CardEntity.new(uuid) {
+            if (card.globalOwner.isEmpty()) card.globalOwner = user.globalOwner
             update(card)
             ban = false
         }.fromEntity()

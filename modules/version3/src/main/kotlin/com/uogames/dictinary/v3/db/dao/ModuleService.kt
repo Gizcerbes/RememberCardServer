@@ -130,6 +130,7 @@ object ModuleService {
         UserService.update(user)
         val uuid = if (module.globalId != defaultUUID) module.globalId else null
         return ModuleEntity.new(uuid) {
+            if (module.globalOwner.isEmpty()) module.globalOwner = user.globalOwner
             update(module)
             ban = false
         }.fromEntity()

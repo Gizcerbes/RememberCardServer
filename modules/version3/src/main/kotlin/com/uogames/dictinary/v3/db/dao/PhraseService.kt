@@ -91,6 +91,7 @@ object PhraseService {
         UserService.update(user)
         val uuid = if (phrase.globalId != defaultUUID) phrase.globalId else null
         return PhraseEntity.new(uuid) {
+            if (phrase.globalOwner.isEmpty()) phrase.globalOwner = user.globalOwner
             update(phrase)
             ban = false
         }.fromEntity()
