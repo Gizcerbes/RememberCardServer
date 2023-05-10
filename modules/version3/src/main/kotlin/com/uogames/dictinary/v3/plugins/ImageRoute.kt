@@ -1,11 +1,15 @@
 package com.uogames.dictinary.v3.plugins
 
+import com.google.gson.Gson
+import com.uogames.dictinary.v3.Exchanges.printBody
+import com.uogames.dictinary.v3.Exchanges.printHeader
 import com.uogames.dictinary.v3.buildPath
 import com.uogames.dictinary.v3.db.entity.Image
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.provider.ImageProvider
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -36,7 +40,7 @@ fun Route.image(path: String) {
                     if (filename.endsWith(format, ignoreCase = true)) {
                         service.delete(UUID.fromString(filename.replace(format, "")))
                     }
-                   return@get call.respond(HttpStatusCode.NotFound)
+                    return@get call.respond(HttpStatusCode.NotFound)
                 }
             }.onFailure {
                 return@get call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
@@ -102,7 +106,7 @@ fun Route.image(path: String) {
 
         authenticate("auth-jwt") {
 
-            post("upload") {
+            post("/upload") {
                 val principal = call.principal<JWTPrincipal>()
                 val map = principal?.payload?.getClaim("stringMap")?.asMap().ifNull {
                     return@post call.respond(HttpStatusCode.BadRequest)
@@ -139,12 +143,45 @@ fun Route.image(path: String) {
                 }.onFailure {
                     return@post call.respond(HttpStatusCode.BadRequest)
                 }
-
             }
 
+            post("/upload/v2") {
+                val principal = call.principal<JWTPrincipal>()
+                val map = principal?.payload?.getClaim("stringMap")?.asMap().ifNull {
+                    return@post call.respond(HttpStatusCode.BadRequest)
+                }
+                val userName = map["Identifier"]?.toString().ifNull {
+                    return@post call.respond(HttpStatusCode.BadRequest)
+                }
+                val uid = map["User UID"]?.toString().ifNull {
+                    return@post call.respond(HttpStatusCode.BadRequest)
+                }
+                runCatching {
+                    var image: Image? = null
+                    var name = ""
+                    val multipartData = call.receiveMultipart()
+                    multipartData.forEachPart { part ->
+                        when (part) {
+                            is PartData.FormItem -> {
+                                image = Gson().fromJson(part.value, Image::class.java)
+                                name = "${image!!.globalId}$format"
+                                image!!.imageUri = "/image/$name"
+                                service.update(image!!, User(uid, userName))
+                            }
+                            is PartData.FileItem -> {
+                                val fileBytes = part.streamProvider().readBytes()
+                                File(dir, "/$name").writeBytes(fileBytes)
+                            }
+                            else -> {}
+                        }
+                        part.dispose()
+                    }
+                    image?.let { call.respond(it) } ?: call.respond(HttpStatusCode.BadRequest)
+                }.onFailure {
+                    println(it.message)
+                }
+                call.respond(HttpStatusCode.BadRequest)
+            }
         }
-
-
     }
-
 }

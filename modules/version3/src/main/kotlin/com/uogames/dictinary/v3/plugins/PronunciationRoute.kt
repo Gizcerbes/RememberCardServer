@@ -1,12 +1,14 @@
 package com.uogames.dictinary.v3.plugins
 
+import com.google.gson.Gson
 import com.uogames.dictinary.v3.buildPath
-import com.uogames.dictinary.v3.db.dao.PronunciationService
+import com.uogames.dictinary.v3.db.entity.Image
 import com.uogames.dictinary.v3.db.entity.Pronunciation
 import com.uogames.dictinary.v3.db.entity.User
 import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.provider.PronunciationProvider
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -140,6 +142,46 @@ fun Route.pronunciation(path:String) {
                 }.onFailure {
                     return@post call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
                 }
+            }
+
+            post("/upload/v2") {
+                val principal = call.principal<JWTPrincipal>()
+                val map = principal?.payload?.getClaim("stringMap")?.asMap().ifNull {
+                    return@post call.respond(HttpStatusCode.BadRequest)
+                }
+                val userName = map["Identifier"]?.toString().ifNull {
+                    return@post call.respond(HttpStatusCode.BadRequest)
+                }
+                val uid = map["User UID"]?.toString().ifNull {
+                    return@post call.respond(HttpStatusCode.BadRequest)
+                }
+                runCatching {
+                    var pronounce: Pronunciation? = null
+                    var name = ""
+                    val multipartData = call.receiveMultipart()
+                    multipartData.forEachPart { part ->
+                        when (part) {
+                            is PartData.FormItem -> {
+                                pronounce = Gson().fromJson(part.value, Pronunciation::class.java)
+                                name = "${pronounce!!.globalId}$format"
+                                pronounce!!.audioUri = "/image/$name"
+                                service.update(pronounce!!, User(uid, userName))
+                            }
+                            is PartData.FileItem -> {
+                                val fileBytes = part.streamProvider().readBytes()
+                                File(dir, "/$name").writeBytes(fileBytes)
+                            }
+                            else -> {}
+                        }
+                        part.dispose()
+                    }
+                    pronounce?.let { call.respond(it) } ?: call.respond(HttpStatusCode.BadRequest)
+                }.onFailure {
+                    println(it.message)
+                }
+                call.respond(HttpStatusCode.BadRequest)
+
+
             }
 
         }

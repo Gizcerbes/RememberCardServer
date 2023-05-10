@@ -5,6 +5,8 @@ import com.uogames.dictinary.v3.db.entity.ModuleCard.Companion.fromEntity
 import com.uogames.dictinary.v3.db.entity.ModuleCardEntity
 import com.uogames.dictinary.v3.db.entity.ModuleCardTable
 import com.uogames.dictinary.v3.db.entity.User
+import com.uogames.dictinary.v3.defaultUUID
+import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.views.ModuleCardView
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -21,7 +23,7 @@ object ModuleCardService {
         .limit(1, number)
         .firstOrNull()?.fromEntity()
 
-    fun getView(id:UUID) = ModuleCardEntity.findById(id)?.let { ModuleCardView.fromEntity(it) }
+    fun getView(id: UUID) = ModuleCardEntity.findById(id)?.let { ModuleCardView.fromEntity(it) }
 
     fun getView(eID: EntityID<UUID>) = ModuleCardEntity[eID].let { ModuleCardView.fromEntity(it) }
 
@@ -32,23 +34,20 @@ object ModuleCardService {
 
     fun new(moduleCard: ModuleCard, user: User): ModuleCard {
         UserService.update(user)
-        return ModuleCardEntity.new {
+        val uuid = if (moduleCard.globalId != defaultUUID) moduleCard.globalId else null
+        return ModuleCardEntity.new(uuid) {
             update(moduleCard)
         }.fromEntity()
     }
 
 
-    fun update(moduleCard: ModuleCard, user: User):ModuleCard? {
+    fun update(moduleCard: ModuleCard, user: User): ModuleCard? {
         UserService.update(user)
         val loaded = ModuleCardEntity.findById(moduleCard.globalId)
-        return if (loaded == null) {
-            ModuleCardEntity.new(moduleCard.globalId) { update(moduleCard) }.fromEntity()
-        } else if (loaded.globalOwner.value == user.globalOwner) {
-            loaded.update(moduleCard)
+        return loaded?.let {
+            if (loaded.globalOwner.value == user.globalOwner) loaded.update(moduleCard)
             loaded.fromEntity()
-        } else {
-            null
-        }
+        }.ifNull { new(moduleCard, user) }
     }
 
 

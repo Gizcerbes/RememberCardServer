@@ -2,6 +2,8 @@ package com.uogames.dictinary.v3.db.dao
 
 import com.uogames.dictinary.v3.db.entity.*
 import com.uogames.dictinary.v3.db.entity.Image.Companion.fromEntity
+import com.uogames.dictinary.v3.defaultUUID
+import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.views.ImageView
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
@@ -19,15 +21,19 @@ object ImageService {
 
     fun new(image: Image, user: User): Image {
         UserService.update(user)
-        return ImageEntity.new {
-            update(image)
+        val uuid = if (image.globalId != defaultUUID) image.globalId else null
+        return ImageEntity.new(uuid) {
+            if (image.globalOwner.isEmpty()) update(Image(image.globalId, user.globalOwner, image.imageUri))
+            else update(image)
             ban = false
         }.fromEntity()
     }
 
     fun update(image: Image, user: User): Image? {
         UserService.update(user)
-        return ImageEntity.findById(image.globalId)?.apply { update(image) }?.fromEntity()
+        return ImageEntity.findById(image.globalId)?.apply {
+            if (globalOwner.value == user.globalOwner) update(image)
+        }?.fromEntity().ifNull { new(image, user) }
     }
 
     fun delete(id: UUID) = ImageEntity.findById(id)?.delete()

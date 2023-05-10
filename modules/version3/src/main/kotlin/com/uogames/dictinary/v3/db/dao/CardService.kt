@@ -5,6 +5,8 @@ import com.uogames.dictinary.v3.charLength
 import com.uogames.dictinary.v3.db.dao.ImageService.cleanImage
 import com.uogames.dictinary.v3.db.entity.*
 import com.uogames.dictinary.v3.db.entity.Card.Companion.fromEntity
+import com.uogames.dictinary.v3.defaultUUID
+import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.views.CardView
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
@@ -139,7 +141,8 @@ object CardService {
 
     fun new(card: Card, user: User): Card {
         UserService.update(user)
-        return CardEntity.new {
+        val uuid = if (card.globalId != defaultUUID) card.globalId else null
+        return CardEntity.new(uuid) {
             update(card)
             ban = false
         }.fromEntity()
@@ -147,18 +150,15 @@ object CardService {
 
     fun update(card: Card, user: User) = transaction {
         val loaded = CardEntity.findById(card.globalId)
-        return@transaction if (loaded == null) {
-            new(card, user)
-        } else if (card.globalOwner == user.globalOwner) {
+        return@transaction loaded?.let {
             UserService.update(user)
             val oldImage = loaded.idImage?.value
-            loaded.update(card)
+            if (loaded.globalOwner.value == user.globalOwner) loaded.update(card)
             commit()
             if (oldImage != null && oldImage != card.idImage) cleanImage(oldImage)
             loaded.fromEntity()
-        } else {
-            null
-        }
+        }.ifNull { new(card, user) }
+
     }
 
     fun ban(

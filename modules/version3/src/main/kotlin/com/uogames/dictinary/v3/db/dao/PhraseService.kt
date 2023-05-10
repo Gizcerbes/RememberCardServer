@@ -9,6 +9,7 @@ import com.uogames.dictinary.v3.db.entity.Phrase.Companion.fromEntity
 import com.uogames.dictinary.v3.db.entity.PhraseEntity
 import com.uogames.dictinary.v3.db.entity.PhraseTable
 import com.uogames.dictinary.v3.db.entity.User
+import com.uogames.dictinary.v3.defaultUUID
 import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.views.PhraseView
 import org.jetbrains.exposed.dao.id.EntityID
@@ -88,7 +89,8 @@ object PhraseService {
 
     fun new(phrase: Phrase, user: User): Phrase {
         UserService.update(user)
-        return PhraseEntity.new {
+        val uuid = if (phrase.globalId != defaultUUID) phrase.globalId else null
+        return PhraseEntity.new(uuid) {
             update(phrase)
             ban = false
         }.fromEntity()
@@ -101,11 +103,13 @@ object PhraseService {
         val loaded = PhraseEntity.findById(phrase.globalId)
         return loaded?.let {
             UserService.update(user)
-            val oldImage = loaded.idImage?.value
-            val oldPronounce = loaded.idPronounce?.value
-            loaded.update(phrase)
-            if (oldImage != null && oldImage != phrase.idImage) cleanImage(oldImage)
-            if (oldPronounce != null && oldPronounce != phrase.idPronounce) cleanPronunciation(oldPronounce)
+            if (loaded.globalOwner.value == user.globalOwner) {
+                val oldImage = loaded.idImage?.value
+                val oldPronounce = loaded.idPronounce?.value
+                loaded.update(phrase)
+                if (oldImage != null && oldImage != phrase.idImage) cleanImage(oldImage)
+                if (oldPronounce != null && oldPronounce != phrase.idPronounce) cleanPronunciation(oldPronounce)
+            }
             loaded.fromEntity()
         }.ifNull {
             new(phrase, user)

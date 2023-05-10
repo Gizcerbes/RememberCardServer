@@ -2,6 +2,8 @@ package com.uogames.dictinary.v3.db.dao
 
 import com.uogames.dictinary.v3.db.entity.*
 import com.uogames.dictinary.v3.db.entity.Pronunciation.Companion.fromEntity
+import com.uogames.dictinary.v3.defaultUUID
+import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.views.PronunciationView
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.JoinType
@@ -21,7 +23,8 @@ object PronunciationService {
 
     fun new(pronunciation: Pronunciation, user: User):Pronunciation {
         UserService.update(user)
-        return PronunciationEntity.new {
+        val uuid = if (pronunciation.globalId != defaultUUID) pronunciation.globalId else null
+        return PronunciationEntity.new(uuid) {
             update(pronunciation)
             ban = false
         }.fromEntity()
@@ -30,8 +33,8 @@ object PronunciationService {
     fun update(pronunciation: Pronunciation, user: User): Pronunciation? {
         UserService.update(user)
         return PronunciationEntity.findById(pronunciation.globalId)?.apply {
-            update(pronunciation)
-        }?.fromEntity()
+            if (globalOwner.value == user.globalOwner) update(pronunciation)
+        }?.fromEntity().ifNull { new(pronunciation, user) }
     }
 
     fun delete(pronunciationID: UUID) {
