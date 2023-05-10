@@ -42,7 +42,6 @@ sourceSets{
 
 dependencies {
 
-    //api(project("modules:version3"))
     implementation(project(":modules:version3"))
     //implementation(npm(":modules:version3"))
 
@@ -64,7 +63,7 @@ dependencies {
     implementation ("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
 
     // runtimeOnly ("mysql:mysql-connector-java:8.0.30")
-    implementation("org.postgresql:postgresql:42.5.0")
+    implementation("org.postgresql:postgresql:42.5.1")
     implementation ("com.zaxxer:HikariCP:5.0.1")
 
     // logging
@@ -74,6 +73,7 @@ dependencies {
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+
 
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")

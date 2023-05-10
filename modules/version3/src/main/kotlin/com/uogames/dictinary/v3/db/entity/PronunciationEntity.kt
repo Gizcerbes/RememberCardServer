@@ -35,7 +35,7 @@ data class Pronunciation(
     @SerializedName("global_id")
     val globalId: UUID,
     @SerializedName("global_owner")
-    val globalOwner: String = "",
+    var globalOwner: String = "",
     @SerializedName("audio_uri")
     var audioUri: String,
     @Transient

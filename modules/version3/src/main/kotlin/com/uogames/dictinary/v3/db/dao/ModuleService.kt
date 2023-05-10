@@ -4,6 +4,8 @@ import com.uogames.dictinary.v3.addAndOp
 import com.uogames.dictinary.v3.charLength
 import com.uogames.dictinary.v3.db.entity.*
 import com.uogames.dictinary.v3.db.entity.Module.Companion.fromEntity
+import com.uogames.dictinary.v3.defaultUUID
+import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.views.ModuleView
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
@@ -126,7 +128,9 @@ object ModuleService {
 
     fun new(module: Module, user: User): Module {
         UserService.update(user)
-        return ModuleEntity.new {
+        val uuid = if (module.globalId != defaultUUID) module.globalId else null
+        return ModuleEntity.new(uuid) {
+            if (module.globalOwner.isEmpty()) module.globalOwner = user.globalOwner
             update(module)
             ban = false
         }.fromEntity()
@@ -134,16 +138,14 @@ object ModuleService {
 
     fun update(module: Module, user: User): Module? {
         val loaded = ModuleEntity.findById(module.globalId)
-        return if (loaded == null) {
-            new(module, user)
-        } else if (loaded.globalOwner.value == user.globalOwner) {
+        return loaded?.let {
             UserService.update(user)
-            ModuleCardTable.deleteWhere { moduleId eq module.globalId }
-            loaded.update(module)
+            if (loaded.globalOwner.value == user.globalOwner) {
+                ModuleCardTable.deleteWhere { moduleId eq module.globalId }
+                loaded.update(module)
+            }
             loaded.fromEntity()
-        } else {
-            null
-        }
+        }.ifNull { new(module, user) }
     }
 
     fun ban(

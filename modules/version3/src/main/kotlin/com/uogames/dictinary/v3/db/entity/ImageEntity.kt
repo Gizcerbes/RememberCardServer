@@ -35,7 +35,7 @@ data class Image(
     @SerializedName("global_id")
     val globalId: UUID,
     @SerializedName("global_owner")
-    val globalOwner: String = "",
+    var globalOwner: String = "",
     @SerializedName("image_uri")
     var imageUri: String,
     @Transient
