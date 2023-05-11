@@ -117,18 +117,7 @@ fun Route.module(path: String) {
                 val user = User(uid, userName)
 
                 runCatching {
-                    if (module.globalId == defaultUUID) {
-                        module.globalOwner = uid
-                        return@post call.respond(service.new(module, user))
-                    } else if (module.globalOwner == uid) {
-                        service.update(module, user)?.let {
-                           return@post call.respond(it)
-                        }.ifNull {
-                            return@post call.respond(HttpStatusCode.BadRequest)
-                        }
-                    } else {
-                        return@post call.respond(HttpStatusCode.BadRequest)
-                    }
+                    return@post call.respond(service.update(module, user))
                 }.onFailure {
                     return@post call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
                 }

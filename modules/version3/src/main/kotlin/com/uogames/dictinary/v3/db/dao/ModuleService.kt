@@ -136,7 +136,7 @@ object ModuleService {
         }.fromEntity()
     }
 
-    fun update(module: Module, user: User): Module? {
+    fun update(module: Module, user: User): Module {
         val loaded = ModuleEntity.findById(module.globalId)
         return loaded?.let {
             UserService.update(user)

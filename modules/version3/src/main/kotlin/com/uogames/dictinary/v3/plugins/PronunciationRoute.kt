@@ -164,7 +164,7 @@ fun Route.pronunciation(path:String) {
                             is PartData.FormItem -> {
                                 pronounce = Gson().fromJson(part.value, Pronunciation::class.java)
                                 name = "${pronounce!!.globalId}$format"
-                                pronounce!!.audioUri = "/image/$name"
+                                pronounce!!.audioUri = "/pronunciation/$name"
                                 service.update(pronounce!!, User(uid, userName))
                             }
                             is PartData.FileItem -> {

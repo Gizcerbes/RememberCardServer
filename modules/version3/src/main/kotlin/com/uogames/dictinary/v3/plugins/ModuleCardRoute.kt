@@ -119,18 +119,7 @@ fun Route.moduleCard(path:String) {
                 val user = User(uid, userName)
 
                 runCatching {
-                    if (card.globalId == defaultUUID) {
-                        card.globalOwner = uid
-                        return@post call.respond(service.new(card, user))
-                    } else if (card.globalOwner == uid) {
-                        service.update(card, User(uid, userName))?.let {
-                            return@post call.respond(it)
-                        }.ifNull {
-                            return@post call.respond(HttpStatusCode.BadRequest)
-                        }
-                    } else {
-                        return@post call.respond(HttpStatusCode.BadRequest)
-                    }
+                    return@post call.respond(service.update(card, user))
                 }.onFailure {
                     return@post call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
                 }

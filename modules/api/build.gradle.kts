@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.uogames"
-version = "0.3.5"
+version = "0.3.7"
 application {
     mainClass.set("com.uogames.dictionary.ApplicationKt")
 
@@ -27,7 +27,7 @@ repositories {
 
 ktor {
     fatJar {
-        archiveFileName.set("fat.jar")
+        archiveFileName.set("fat-$version.jar")
     }
     docker{
         jreVersion.set(io.ktor.plugin.features.JreVersion.JRE_17)

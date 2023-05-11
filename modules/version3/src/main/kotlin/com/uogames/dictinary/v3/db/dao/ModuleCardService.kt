@@ -42,7 +42,7 @@ object ModuleCardService {
     }
 
 
-    fun update(moduleCard: ModuleCard, user: User): ModuleCard? {
+    fun update(moduleCard: ModuleCard, user: User): ModuleCard {
         UserService.update(user)
         val loaded = ModuleCardEntity.findById(moduleCard.globalId)
         return loaded?.let {

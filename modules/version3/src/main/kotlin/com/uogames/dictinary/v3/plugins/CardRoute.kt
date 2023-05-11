@@ -122,20 +122,10 @@ fun Route.card(path: String) {
                 val card = call.receiveNullable<Card>()
                     .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
 
+                val user = User(uid, userName)
+
                 runCatching {
-                    val user = User(uid, userName)
-                    if (card.globalId == defaultUUID) {
-                        card.globalOwner = uid
-                        return@post call.respond(provider.new(card, user))
-                    } else if (card.globalOwner == uid) {
-                        provider.update(card, user)?.let {
-                            return@post call.respond(it)
-                        }.ifNull {
-                            return@post call.respond(HttpStatusCode.BadRequest)
-                        }
-                    } else {
-                        return@post call.respond(HttpStatusCode.BadRequest)
-                    }
+                    return@post call.respond(provider.update(card, user))
                 }.onFailure {
                     return@post call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
                 }

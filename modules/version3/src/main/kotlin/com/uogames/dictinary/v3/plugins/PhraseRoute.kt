@@ -100,35 +100,26 @@ fun Route.phrase(path: String) {
         authenticate("auth-jwt") {
 
             post {
+
                 val map = call.principal<JWTPrincipal>()
-                    ?.payload
-                    ?.getClaim("stringMap")
-                    ?.asMap()
-                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+                        ?.payload
+                        ?.getClaim("stringMap")
+                        ?.asMap()
+                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
                 val userName = map["Identifier"]
-                    ?.toString()
-                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+                        ?.toString()
+                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
                 val uid = map["User UID"]
-                    ?.toString()
-                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+                        ?.toString()
+                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
                 val phrase = call.receiveNullable<Phrase>()
-                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
                 val user = User(uid, userName)
 
                 runCatching {
-                    if (phrase.globalId == defaultUUID) {
-                        phrase.globalOwner = uid
-                        return@post call.respond(service.new(phrase, user))
-                    } else if (phrase.globalOwner == uid) {
-                        service.update(phrase, user)?.let {
-                            return@post call.respond(it)
-                        }.ifNull {
-                            return@post call.respond(HttpStatusCode.BadRequest)
-                        }
-                    } else {
-                        return@post call.respond(HttpStatusCode.BadRequest)
-                    }
+                    return@post call.respond(service.update(phrase, user))
                 }.onFailure {
+                    println(it.message)
                     return@post call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
                 }
             }
