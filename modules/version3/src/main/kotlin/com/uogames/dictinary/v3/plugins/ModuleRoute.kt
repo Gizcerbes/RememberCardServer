@@ -30,7 +30,7 @@ fun Route.module(path: String) {
             val countrySecond = call.parameters["country-second"]
             val number = call.parameters["number"].toLongOrDefault(0)
             runCatching {
-                service.get(text,langFirst, langSecond, countryFirst, countrySecond, number)?.let {
+                service.get(text, langFirst, langSecond, countryFirst, countrySecond, number)?.let {
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -48,7 +48,7 @@ fun Route.module(path: String) {
             val countrySecond = call.parameters["country-second"]
             val number = call.parameters["number"].toLongOrDefault(0)
             runCatching {
-                service.getView(text,langFirst, langSecond, countryFirst, countrySecond, number)?.let {
+                service.getView(text, langFirst, langSecond, countryFirst, countrySecond, number)?.let {
                     return@get call.respond(it)
                 }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
@@ -111,14 +111,16 @@ fun Route.module(path: String) {
                 val uid = map["User UID"]
                     ?.toString()
                     .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
-                val module = call.receiveNullable<Module>()
-                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
-
-                val user = User(uid, userName)
 
                 runCatching {
+                    val module = call.receiveNullable<Module>()
+                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+
+                    val user = User(uid, userName)
+
                     return@post call.respond(service.update(module, user))
                 }.onFailure {
+                    println(it.message)
                     return@post call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
                 }
             }

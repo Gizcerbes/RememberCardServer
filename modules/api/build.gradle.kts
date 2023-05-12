@@ -69,16 +69,5 @@ dependencies {
     // logging
     implementation("ch.qos.logback:logback-classic:$logback_version")
 
-    // client
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
-    implementation("com.squareup.okhttp3:okhttp")
-    implementation("com.squareup.okhttp3:logging-interceptor")
-
-
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
-
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.google.code.gson:gson:2.10")
 
 }

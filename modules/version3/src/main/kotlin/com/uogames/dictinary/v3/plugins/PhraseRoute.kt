@@ -102,21 +102,22 @@ fun Route.phrase(path: String) {
             post {
 
                 val map = call.principal<JWTPrincipal>()
-                        ?.payload
-                        ?.getClaim("stringMap")
-                        ?.asMap()
-                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+                    ?.payload
+                    ?.getClaim("stringMap")
+                    ?.asMap()
+                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
                 val userName = map["Identifier"]
-                        ?.toString()
-                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+                    ?.toString()
+                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
                 val uid = map["User UID"]
-                        ?.toString()
-                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
-                val phrase = call.receiveNullable<Phrase>()
-                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
-                val user = User(uid, userName)
-
+                    ?.toString()
+                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
                 runCatching {
+
+                    val phrase = call.receiveNullable<Phrase>()
+                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+                    val user = User(uid, userName)
+
                     return@post call.respond(service.update(phrase, user))
                 }.onFailure {
                     println(it.message)

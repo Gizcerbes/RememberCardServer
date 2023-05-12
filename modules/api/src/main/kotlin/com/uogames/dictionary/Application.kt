@@ -48,6 +48,6 @@ fun Application.module(testing: Boolean = false) {
 
     configV3()
 
-    println("version - 0.3.7")
+    println("version - 0.3.7-8")
 
 }

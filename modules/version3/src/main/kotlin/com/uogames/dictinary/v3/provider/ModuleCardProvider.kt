@@ -22,6 +22,10 @@ object ModuleCardProvider {
 
     fun new(moduleCard: ModuleCard, user: User) = transaction { mcs.new(moduleCard, user) }
 
-    fun update(moduleCard: ModuleCard, user: User) = transaction { mcs.update(moduleCard, user) }
+    fun update(moduleCard: ModuleCard, user: User) = transaction {
+        val  r = mcs.update(moduleCard, user)
+        commit()
+        return@transaction r
+    }
 
 }

@@ -10,6 +10,8 @@ import com.uogames.dictinary.v3.ifNull
 import com.uogames.dictinary.v3.views.ModuleCardView
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.or
 import java.util.UUID
 
 object ModuleCardService {

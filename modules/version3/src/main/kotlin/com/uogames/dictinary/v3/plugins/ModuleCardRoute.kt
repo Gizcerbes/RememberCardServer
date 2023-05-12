@@ -17,7 +17,7 @@ import io.ktor.server.routing.*
 import java.util.UUID
 
 
-fun Route.moduleCard(path:String) {
+fun Route.moduleCard(path: String) {
 
     val rootPath = environment?.rootPath ?: ""
 
@@ -31,7 +31,7 @@ fun Route.moduleCard(path:String) {
             runCatching {
                 service.get(UUID.fromString(moduleID), number)?.let {
                     return@get call.respond(it)
-                }.ifNull{
+                }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
                 }
             }.onFailure {
@@ -50,7 +50,7 @@ fun Route.moduleCard(path:String) {
                     it.card.translate.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
                     it.card.translate.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
-                }.ifNull{
+                }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
                 }
             }.onFailure {
@@ -63,7 +63,7 @@ fun Route.moduleCard(path:String) {
             runCatching {
                 service.get(UUID.fromString(id))?.let {
                     return@get call.respond(it)
-                }.ifNull{
+                }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
                 }
             }.onFailure {
@@ -81,7 +81,7 @@ fun Route.moduleCard(path:String) {
                     it.card.translate.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
                     it.card.translate.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
-                }.ifNull{
+                }.ifNull {
                     return@get call.respond(HttpStatusCode.NotFound)
                 }
             }.onFailure {
@@ -112,15 +112,17 @@ fun Route.moduleCard(path:String) {
                 val uid = map["User UID"]
                     ?.toString()
                     .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
-                val card = call
-                    .receiveNullable<ModuleCard>()
-                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
-
-                val user = User(uid, userName)
 
                 runCatching {
+                    val card = call
+                        .receiveNullable<ModuleCard>()
+                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+
+                    val user = User(uid, userName)
+
                     return@post call.respond(service.update(card, user))
                 }.onFailure {
+                    println(it.message)
                     return@post call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
                 }
 

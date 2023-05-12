@@ -30,7 +30,7 @@ fun Route.card(path: String) {
             runCatching {
                 provider.get(text, langFirst, langSecond, countryFirst, countrySecond, number)?.let {
                     return@get call.respond(it)
-                }.ifNull{
+                }.ifNull {
                     return@get call.respond(HttpStatusCode.BadRequest)
                 }
             }.onFailure {
@@ -53,7 +53,7 @@ fun Route.card(path: String) {
                     it.translate.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
                     it.translate.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
                     return@get call.respond(it)
-                }.ifNull{
+                }.ifNull {
                     return@get call.respond(HttpStatusCode.BadRequest)
                 }
             }.onFailure {
@@ -119,14 +119,15 @@ fun Route.card(path: String) {
                 val uid = map["User UID"]
                     ?.toString()
                     .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
-                val card = call.receiveNullable<Card>()
-                    .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
-
-                val user = User(uid, userName)
-
                 runCatching {
+                    val card = call.receiveNullable<Card>()
+                        .ifNull { return@post call.respond(HttpStatusCode.BadRequest) }
+
+                    val user = User(uid, userName)
+
                     return@post call.respond(provider.update(card, user))
                 }.onFailure {
+                    println(it.message)
                     return@post call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
                 }
             }
