@@ -1,0 +1,46 @@
+name: Release Build
+
+on: workflow_dispatch
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: 'master'
+    - name: set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Clean build
+      run: ./gradlew clean
+    
+          
+    - name: Build 
+      run: ./gradlew build
+
+    - name: Build bundle release
+      run: ./gradlew buildFatJar
+
+    - name: Get Version
+      id: tag
+      run: |
+          echo "version=$(${{github.workspace}}/gradlew version -q)" >> $GITHUB_OUTPUT
+          echo "long_version=v$(${{github.workspace}}/gradlew version -q)-${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+          
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: "${{ steps.tag.outputs.long_version }}"
+        files: | 
+          build/libs/fat-${{ steps.tag.outputs.version }}.jar
+          LICENSE
