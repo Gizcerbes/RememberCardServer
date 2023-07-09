@@ -48,7 +48,7 @@ ktor {
 }
 
 
-tasks.register("version"){    println("Hello")
+tasks.register("version"){   
     println(version)
 }
 
