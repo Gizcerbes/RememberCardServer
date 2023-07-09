@@ -35,7 +35,7 @@ jobs:
       id: tag
       run: |
           echo "version=$(${{github.workspace}}/gradlew version -q)" >> $GITHUB_OUTPUT
-          echo "long_version=v${{ steps.tag.outputs.version }}-${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+          echo "long_version=v$(${{github.workspace}}/gradlew version -q)-${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
           
     - name: Release
       uses: softprops/action-gh-release@v1
