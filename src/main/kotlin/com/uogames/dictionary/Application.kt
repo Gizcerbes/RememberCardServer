@@ -55,9 +55,9 @@ fun Application.module() {
 
     configV3(rootPath, volume)
 
-    routing {
-        test()
-    }
+//    routing {
+//        test()
+//    }
 
     println("version - 0.5.0-1")
 

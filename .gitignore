@@ -6,3 +6,4 @@
 /modules/api/build/
 application.conf
 dbconfig.properties
+app
