@@ -34,12 +34,13 @@ jobs:
     - name: Get Version
       id: tag
       run: |
-          echo "version=v$(${{github.workspace}}/gradlew version -q)" >> $GITHUB_OUTPUT
+          echo "version=$(${{github.workspace}}/gradlew version -q)" >> $GITHUB_OUTPUT
+          echo "long_version=v$(${{github.workspace}}/gradlew gradlew version -q)-${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
           
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: "${{ steps.tag.outputs.version }}"
+        tag_name: "${{ steps.tag.outputs.long_version }}"
         files: | 
           build/libs/fat-${{ steps.tag.outputs.version }}.jar
           LICENSE
