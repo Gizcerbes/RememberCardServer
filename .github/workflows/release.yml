@@ -34,7 +34,7 @@ jobs:
     - name: Get Version
       id: tag
       run: |
-          echo "version=v$(${{github.workspace}}/gradlew -q version)" >> $GITHUB_OUTPUT
+          echo "version=v$(${{github.workspace}}/gradlew version -q)" >> $GITHUB_OUTPUT
           
     - name: Release
       uses: softprops/action-gh-release@v1
