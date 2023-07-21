@@ -33,6 +33,15 @@ object PhraseProvider {
         country: String? = null,
         number: Long
     ) = transaction { ps.getView(text, language, country, number) }
+
+    fun getListView(
+        text: String? = null,
+        language: String? = null,
+        country: String? = null,
+        number: Long,
+        limit: Int
+    ) = transaction { ps.getListView(text, language, country, number, limit) }
+
     fun new(phrase: Phrase, user: User) = transaction { ps.new(phrase, user) }
 
     fun update(

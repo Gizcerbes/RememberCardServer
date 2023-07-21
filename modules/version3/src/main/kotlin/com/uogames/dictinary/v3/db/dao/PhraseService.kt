@@ -51,7 +51,8 @@ object PhraseService {
         text: String? = null,
         language: String? = null,
         country: String? = null,
-        number: Long
+        number: Long,
+        limit: Int = 1
     ): Query {
         return PhraseTable
             .slice(PhraseTable.columns)
@@ -61,7 +62,7 @@ object PhraseService {
                 PhraseTable.length to SortOrder.ASC,
                 PhraseTable.phrase to SortOrder.ASC
             )
-            .limit(1, number)
+            .limit(limit, number)
     }
 
     fun get(
@@ -81,6 +82,20 @@ object PhraseService {
         country: String? = null,
         number: Long
     ) = getQuery(text, language, country, number).firstOrNull()?.let { PhraseView.fromRow(it) }
+
+    fun getListView(
+        text: String? = null,
+        language: String? = null,
+        country: String? = null,
+        number: Long,
+        limit: Int
+    ) = getQuery(
+        text = text,
+        language = language,
+        country = country,
+        number = number,
+        limit = limit
+    ).map { PhraseView.fromRow(it) }
 
     fun new(phrase: Phrase, user: User): Phrase {
         UserService.update(user)

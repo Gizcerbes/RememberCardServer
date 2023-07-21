@@ -6,6 +6,7 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import java.util.*
+import kotlin.collections.List
 
 class ModuleCardService(private val client: HttpClient) {
 
@@ -20,6 +21,17 @@ class ModuleCardService(private val client: HttpClient) {
         .get("/remember-card/v3/module-card") {
             moduleID?.let { parameter("module-id", it) }
             parameter("number", number)
+        }.ifSuccess()
+
+    suspend fun getList(
+        moduleID: UUID? = null,
+        number: Long,
+        limit: Int = 1
+    ): List<ModuleCardResponse> = client
+        .get("/remember-card/v3/module-card") {
+            moduleID?.let { parameter("module-id", it) }
+            parameter("number", number)
+            parameter("limit", limit)
         }.ifSuccess()
 
     suspend fun get(globalId: UUID): ModuleCardResponse = client
