@@ -46,7 +46,7 @@ private fun prepare(config: HikariConfig) {
 }
 
 private fun create() = transaction {
-    SchemaUtils.create(PhraseTable)
+    //SchemaUtils.create(PhraseTable)
     SchemaUtils.create(Config)
     // migration to v3
     while (true) when (ConfigEntity.findById("version")?.value?.toInt() ?: 1) {
@@ -54,7 +54,7 @@ private fun create() = transaction {
         3 -> Migration3to4.migration()
         4 -> Migration4to5.migration()
         in 5..Int.MAX_VALUE -> break
-        else -> Migration2to3().createDBv3()
+        else -> Migration4to5.createDBv5()
     }
 
 }

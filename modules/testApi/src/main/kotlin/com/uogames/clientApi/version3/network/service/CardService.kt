@@ -26,6 +26,25 @@ class CardService(private val client: HttpClient) {
             parameter("number", number)
         }.ifSuccess()
 
+    suspend fun getList(
+        text: String? = null,
+        langFirst: String? = null,
+        langSecond: String? = null,
+        countryFirst: String? = null,
+        countrySecond: String? = null,
+        number: Long,
+        limit: Int = 1
+    ): List<CardResponse> = client
+        .get("/remember-card/v3/card/list/view") {
+            text?.let { parameter("text", it) }
+            langFirst?.let { parameter("lang-first", it) }
+            langSecond?.let { parameter("lang-second", it) }
+            countryFirst?.let { parameter("country-first", it) }
+            countrySecond?.let { parameter("country-second", it) }
+            parameter("number", number)
+            parameter("limit", limit)
+        }.ifSuccess()
+
     suspend fun get(globalId: UUID): CardResponse = client
         .get("/remember-card/v3/card/$globalId")
         .ifSuccess()

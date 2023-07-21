@@ -59,20 +59,22 @@ fun Route.phrase(path: String) {
             }
         }
 
-        get("/test/view") {
+        get("/list/view") {
             val text = call.parameters["text"]
             val language = call.parameters["lang"]
             val country = call.parameters["country"]
             val number = call.parameters["number"].toLongOrDefault(0)
+            val limit = call.parameters["limit"].toLongOrDefault(1).toInt()
             runCatching {
-                val r = transaction {
-                    CardViewEntity.all().firstOrNull()
+                service.getListView(text, language, country, number,limit).map {
+                    it.image?.apply { imageUri = buildPath("$rootPath$path$imageUri") }
+                    it.pronounce?.apply { audioUri = buildPath("$rootPath$path$audioUri") }
+                    return@map it
+                }.apply {
+                    return@get call.respond(this)
                 }
-                println(r)
-                return@get call.respond(HttpStatusCode.OK)
             }.onFailure {
-                throw it
-                return@get call.respond(HttpStatusCode.BadRequest)
+                return@get call.respond(HttpStatusCode.BadRequest, message = it.message.orEmpty())
             }
         }
 

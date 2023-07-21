@@ -9,12 +9,12 @@ val exposed_version: String by project
 
 plugins {
     application
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.9.0"
     id("io.ktor.plugin") version "2.3.1"
 }
 
 group = "com.uogames"
-version = "0.5.0"
+version = "0.5.1"
 
 application {
     mainClass.set("com.uogames.dictionary.ApplicationKt")
@@ -80,6 +80,6 @@ dependencies {
     implementation ("com.zaxxer:HikariCP:5.0.1")
 
     // logging
-    implementation("ch.qos.logback:logback-classic:$logback_version")
 
+    implementation("ch.qos.logback:logback-classic:$logback_version")
 }

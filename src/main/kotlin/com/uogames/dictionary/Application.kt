@@ -59,6 +59,6 @@ fun Application.module() {
 //        test()
 //    }
 
-    println("version - 0.5.0-1")
+    println("version - 0.5.1-1")
 
 }

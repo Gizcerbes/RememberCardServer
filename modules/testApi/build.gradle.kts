@@ -4,7 +4,7 @@ val ktor_version: String by project
 
 plugins {
     `java-library`
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.9.0"
 }
 
 group = "org.example"
